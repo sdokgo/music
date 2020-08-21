@@ -138,6 +138,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         });
 
 
+
         if (!mActivityMusic.isServiceBound()) {
             getSongList();
             if (mList.size() > 0) {
@@ -163,6 +164,28 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 }
             });
         }
+
+        mImageDislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Song song = mList.get(mSongIndex);
+                if (song.getIsFavorite()==0){
+                    song.setIsFavorite(1);
+                }else {
+                    song.setIsFavorite(0);
+                }
+            }
+        });
+        mImageLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Song song = mList.get(mSongIndex);
+                if (song.getIsFavorite()==0){
+                    song.setIsFavorite(2);
+                }
+            }
+        });
+
     }
 
 
