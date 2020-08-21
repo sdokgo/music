@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ActivityMusic">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:id="@+id/appbarlayout"
+        android:background="@color/colorOrange"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+
+            android:id="@+id/toolbar"
+            app:titleTextAppearance="@style/Medium"
+            android:layout_width="match_parent"
+            android:layout_height="78dp">
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_below="@id/appbarlayout"
+        android:layout_above="@id/layoutPlayBar"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:id="@+id/framesong"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"/>
+        <FrameLayout
+            android:id="@+id/framesongplay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/layoutPlayBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp">
+        <ImageView
+            android:layout_margin="5dp"
+            android:id="@+id/img_playbar"
+            android:src="@drawable/music"
+            android:layout_width="64dp"
+            android:layout_height="64dp"/>
+        <LinearLayout
+            android:layout_marginRight="@dimen/dimen_20dp"
+            android:layout_toLeftOf="@id/playBar_Pause"
+            android:layout_toRightOf="@id/img_playbar"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:singleLine="true"
+                android:id="@+id/tenbaihat_playbar"
+                android:layout_weight="1"
+                android:textSize="20sp"
+                android:text="Ten Bai hat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:singleLine="true"
+                android:id="@+id/tencasi_playbar"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:text="ten ca si"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <ImageView
+            android:layout_marginRight="@dimen/dimen_20dp"
+            android:id="@+id/playBar_Pause"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</RelativeLayout>
+
+
