@@ -99,31 +99,15 @@ public class AllSongsFragment extends Fragment implements ActivityMusic.IUpdateA
             public void onItemClick(View itemView, int position) {
                 mSongIndex = position;
                 Song song = mList.get(position);
-                if (mFavoriteList.size() > 0) {
-                    boolean check = false;
-                    for (int i = 0; i < mFavoriteList.size(); i++) {
-                        if (mFavoriteList.get(i).getId() == song.getId()) {
-                            check = true;
-                        }
-                    }
-                    if (!check) {
-                        int countOfPlay = song.getCountOfPlay();
-                        song.setCountOfPlay(++countOfPlay);
-                        if (song.getCountOfPlay() == 3 && song.getIsFavorite() == 0) {
-                            mFavoriteList.add(song);
-                        }
-                    }
-                } else {
-                    int countOfPlay = song.getCountOfPlay();
-                    song.setCountOfPlay(++countOfPlay);
-                    if (song.getCountOfPlay() == 3 && song.getIsFavorite() == 0) {
-                        mFavoriteList.add(song);
-                    }
+                int countOfPlay = song.getCountOfPlay();
+                song.setCountOfPlay(++countOfPlay);
+                if (song.getCountOfPlay() == 3 && song.getIsFavorite() == 0) {
+                    mFavoriteList.add(song);
+                    song.setIsFavorite(2);
                 }
                 mActivityMusic.playAudio(position, mList);
                 mActivityMusic.setmIsPlaying(0);
                 update(position);
-                Toast.makeText(getContext(),mFavoriteList.size()+ "", Toast.LENGTH_SHORT).show();
             }
         });
 
