@@ -103,7 +103,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mAllSongsFragment = new AllSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
 
-
         mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
@@ -125,13 +124,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,mToolbar,
-                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 
+        final FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.nav_all:
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.framesong, mAllSongsFragment)
@@ -139,7 +139,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         break;
                     case R.id.nav_favorite:
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.framesong,new FavoriteSongsFragment())
+                                .replace(R.id.framesong, favoriteSongsFragment)
                                 .commit();
                         break;
                 }
@@ -150,8 +150,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-
 
         if (savedInstanceState != null) {
             mIsPlaying = savedInstanceState.getInt(IS_PLAYING);

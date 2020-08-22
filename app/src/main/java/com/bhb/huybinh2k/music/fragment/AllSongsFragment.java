@@ -37,16 +37,6 @@ import java.util.List;
 
 public class AllSongsFragment extends BaseSongListFragment {
 
-
-
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_all_songs, container, false);
-//        Log.d("log", "onCreateViewAllSongsFragment");
-//        return view;
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return super.onCreateView(inflater, container, savedInstanceState);

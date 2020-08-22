@@ -83,6 +83,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mReplace = false;
             }
         } else {
+            update(mSongIndex);
             mRecyclerView.scrollToPosition(mSongIndex);
             mAdapter.setiOnClickSongListener(mIOnClickSongListener);
         }
@@ -95,7 +96,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mList.get(position).setCountOfPlay(++countOfPlay);
                 if (mList.get(position).getCountOfPlay() >= 3 && mList.get(position).getIsFavorite() == 0) {
                     mList.get(position).setIsFavorite(2);
-                    mFavoriteList.add(mList.get(position));
+                    new StorageUtil(getContext()).storeSongList(mList);
                 }
                 mActivityMusic.playAudio(position, mList);
                 mActivityMusic.setmIsPlaying(0);
@@ -108,21 +109,18 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("log", "onCreateAllSongsFragment");
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d("log", "onDestroyAllSongsFragment");
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("log", "onStartAllSongsFragment");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(mActivityMusic.BROADCAST_RECEIVER);
         getActivity().registerReceiver(broadcastReceiver, intentFilter);
@@ -139,7 +137,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("log", "onStopAllSongsFragment");
         getActivity().unregisterReceiver(broadcastReceiver);
         mReplace = true;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {

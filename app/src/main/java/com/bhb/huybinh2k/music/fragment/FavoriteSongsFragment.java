@@ -25,13 +25,6 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        List<Song> mListSong = new StorageUtil(getContext()).loadSongList();
-        for (int i=0;i<mListSong.size();i++){
-            if (mListSong.get(i).getIsFavorite()==2){
-                mListSong.get(i).setId(i+1);
-                mList.add(mListSong.get(i));
-            }
-        }
         super.onViewCreated(view, savedInstanceState);
     }
 }
