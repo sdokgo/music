@@ -85,7 +85,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
             createNotificationChannel();
             mStorageUtil = new StorageUtil(getApplicationContext());
-            mSongListService = mStorageUtil.loadSongList();
+            mSongListService = mStorageUtil.loadSongListPlaying();
             mSongIndexService = mStorageUtil.loadSongIndex();
             mShuffle = mStorageUtil.loadShuffle();
             mRepeat = mStorageUtil.loadRepeat();

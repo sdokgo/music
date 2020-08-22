@@ -3,7 +3,6 @@ package com.bhb.huybinh2k.music;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -15,7 +14,7 @@ public class StorageUtil {
     private static final String SHUFFLE = "com.bhb.huybinh2k.SHUFFLE";
     private static final String REPEAT = "com.bhb.huybinh2k.REPEAT";
     private static final String SONG_LIST = "com.bhb.huybinh2k.SONG_LIST";
-    private static final String FAVORITE_SONG_LIST = "com.bhb.huybinh2k.FAVORITE_SONG_LIST";
+    private static final String LIST_SONG_PLAYING = "com.bhb.huybinh2k.LIST_SONG_PLAYING";
     private static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
     private SharedPreferences mPreferences;
     private Context mContext;
@@ -24,7 +23,7 @@ public class StorageUtil {
         this.mContext = context;
     }
 
-    public void storeSong(List<Song> list) {
+    public void storeSongList(List<Song> list) {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
         Gson gson = new Gson();
@@ -34,19 +33,19 @@ public class StorageUtil {
     }
 
 
-    public void storeFavoriteSong(List<Song> list) {
+    public void storeSongListPlaying(List<Song> list) {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(list);
-        editor.putString(FAVORITE_SONG_LIST, json);
+        editor.putString(LIST_SONG_PLAYING, json);
         editor.apply();
     }
 
-    public List<Song> loadFavoriteSongList() {
+    public List<Song> loadSongListPlaying() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = mPreferences.getString(FAVORITE_SONG_LIST, null);
+        String json = mPreferences.getString(LIST_SONG_PLAYING, null);
         Type type = new TypeToken<List<Song>>() {
         }.getType();
         return gson.fromJson(json, type);
@@ -96,7 +95,6 @@ public class StorageUtil {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         return mPreferences.getInt(REPEAT, -1);
     }
-
 
     public void clearSongList() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);

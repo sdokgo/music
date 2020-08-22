@@ -1,7 +1,10 @@
 package com.bhb.huybinh2k.music.activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 
 import android.app.ActivityManager;
@@ -17,11 +20,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
@@ -31,7 +34,9 @@ import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.fragment.AllSongsFragment;
+import com.bhb.huybinh2k.music.fragment.FavoriteSongsFragment;
 import com.bhb.huybinh2k.music.fragment.MediaPlaybackFragment;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
 
@@ -92,15 +97,16 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
-        mList = new StorageUtil(this).loadSongList();
+        mList = new StorageUtil(this).loadSongListPlaying();
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mAllSongsFragment = new AllSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
 
+
         mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,
+            getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
                     mAllSongsFragment, "allsongsfragment").commit();
             mImagePause.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -115,6 +121,38 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                     .replace(R.id.framesongplay, mMediaPlaybackFragment)
                     .commit();
         }
+
+        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,mToolbar,
+                R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.nav_all:
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.framesong, mAllSongsFragment)
+                                .commit();
+                        break;
+                    case R.id.nav_favorite:
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.framesong,new FavoriteSongsFragment())
+                                .commit();
+                        break;
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+
+
         if (savedInstanceState != null) {
             mIsPlaying = savedInstanceState.getInt(IS_PLAYING);
             mResumePosition = savedInstanceState.getInt(RESUME_POSITION);
@@ -161,7 +199,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public void playAudio(int songIndex, List<Song> list) {
         if (!mServiceBound) {
             StorageUtil storage = new StorageUtil(this);
-            storage.storeSong(list);
+            storage.storeSongListPlaying(list);
             storage.storeSongIndex(songIndex);
             mList = list;
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
@@ -315,6 +353,10 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * check xem service có đang chạy hay ko

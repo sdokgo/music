@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUpdateMediaPlaybackFragment {
-    private List<Song> mList;
+    private List<Song> mListPlaying = new ArrayList<>();
     private RelativeLayout mLayoutPlayBar;
     private ImageView mImageSong, mImageIcon, mImagePause, mImageShuffle, mImageRepeat;
     private ImageView mImageNext, mImagePrev, mImageLike, mImageDislike, mImageList;
@@ -81,8 +81,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d("log", "onViewCreatedViewMediaPlaybackFragment");
         super.onViewCreated(view, savedInstanceState);
-
-        mList = new ArrayList<>();
         mSongIndex = mStorageUtil.loadSongIndex();
         mOrientation = getResources().getConfiguration().orientation;
         updateImageRepeatShuffle();
@@ -141,8 +139,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
         if (!mActivityMusic.isServiceBound()) {
             getSongList();
-            if (mList.size() > 0) {
-                mActivityMusic.playAudio(0, mList);
+            if (mListPlaying.size() > 0) {
+                mActivityMusic.playAudio(0, mListPlaying);
             } else {
                 Toast.makeText(getContext(), "No music found", Toast.LENGTH_SHORT).show();
             }
@@ -150,7 +148,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         }
 
         if (mSongIndex != -1) {
-            mList = mStorageUtil.loadSongList();
+            mListPlaying = mStorageUtil.loadSongListPlaying();
             updateUI(mSongIndex);
         }
 
@@ -168,7 +166,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageDislike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Song song = mList.get(mSongIndex);
+                Song song = mListPlaying.get(mSongIndex);
                 if (song.getIsFavorite()==0){
                     song.setIsFavorite(1);
                 }else {
@@ -179,7 +177,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Song song = mList.get(mSongIndex);
+                Song song = mListPlaying.get(mSongIndex);
                 if (song.getIsFavorite()==0){
                     song.setIsFavorite(2);
                 }
@@ -310,7 +308,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     public void updateUI(int index) {
         mLayoutPlayBar.setVisibility(View.GONE);
         updateImagePlayPause();
-        Song song = mList.get(index);
+        Song song = mListPlaying.get(index);
         mImageSong.setImageURI(Uri.parse(song.getImg()));
         mImageIcon.setImageURI(Uri.parse(song.getImg()));
         mSongName.setText(song.getSongName());
@@ -456,7 +454,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
 
     public void getSongList() {
-        mList.clear();
+        mListPlaying.clear();
         ContentResolver musicResolver = getActivity().getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
@@ -481,7 +479,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
                     Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
-                    mList.add(new Song(id, thisTitle, songpath, thisArtist, albumArt, milliseconds));
+                    mListPlaying.add(new Song(id, thisTitle, songpath, thisArtist, albumArt, milliseconds));
                     id++;
 
                 }
