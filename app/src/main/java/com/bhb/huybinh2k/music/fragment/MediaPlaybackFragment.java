@@ -136,7 +136,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         });
 
 
-
         if (!mActivityMusic.isServiceBound()) {
             getSongList();
             if (mListPlaying.size() > 0) {
@@ -167,9 +166,9 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             @Override
             public void onClick(View view) {
                 Song song = mListPlaying.get(mSongIndex);
-                if (song.getIsFavorite()==0){
+                if (song.getIsFavorite() == 0) {
                     song.setIsFavorite(1);
-                }else {
+                } else {
                     song.setIsFavorite(0);
                 }
             }
@@ -178,7 +177,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             @Override
             public void onClick(View view) {
                 Song song = mListPlaying.get(mSongIndex);
-                if (song.getIsFavorite()==0){
+                if (song.getIsFavorite() == 0) {
                     song.setIsFavorite(2);
                 }
             }
@@ -200,10 +199,17 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         if (mRepeat == -1) {
             mRepeat = 0;
         }
-        if (mRepeat == 0) mImageRepeat.setImageResource(R.drawable.ic_repeat_white);
-        else if (mRepeat == 1) {
-            mImageRepeat.setImageResource(R.drawable.ic_repeat_black);
-        } else if (mRepeat == 2) mImageRepeat.setImageResource(R.drawable.ic_repeat_one);
+        switch (mRepeat) {
+            case 0:
+                mImageRepeat.setImageResource(R.drawable.ic_repeat_white);
+                break;
+            case 1:
+                mImageRepeat.setImageResource(R.drawable.ic_repeat_black);
+                break;
+            case 2:
+                mImageRepeat.setImageResource(R.drawable.ic_repeat_one);
+                break;
+        }
     }
 
 

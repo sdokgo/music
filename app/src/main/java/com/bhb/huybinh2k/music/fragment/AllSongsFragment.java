@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
@@ -44,9 +45,12 @@ public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mList.clear();
         getSongList();
+        Toast.makeText(getContext(), mList.size()+ "", Toast.LENGTH_SHORT).show();
         super.onViewCreated(view, savedInstanceState);
-        Log.d("log", "onViewCreatedAllSongsFragment");
+        int i = new StorageUtil(getContext()).loadSongIndex();
+        if (i != -1) update(i);
     }
 
     /**
@@ -68,7 +72,6 @@ public class AllSongsFragment extends BaseSongListFragment {
                             musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String songpath = musicCursor.getString(
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-
                     Long albumId = musicCursor.getLong(musicCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
                     Uri sArtworkUri = Uri
@@ -85,7 +88,6 @@ public class AllSongsFragment extends BaseSongListFragment {
                 while (musicCursor.moveToNext());
             }
         }
-        new StorageUtil(getContext()).storeSongList(mList);
     }
 
 }

@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
@@ -25,6 +26,9 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        mList.clear();
+        mList = favoriteSongDB.read();
+        Toast.makeText(getContext(), mList.size()+ "", Toast.LENGTH_SHORT).show();
         super.onViewCreated(view, savedInstanceState);
     }
 }

@@ -12,15 +12,33 @@ public class SongDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "favorite_db";
 
     static final String DB_TABLE = "favorite_tb";
-    public SongDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory,
-                              int version, DatabaseErrorHandler errorHandler) {
+    public static final String ID = "song_id";
+    public static final String ID_PROVIDER = "song_id_provider";
+    public static final String SONG_NAME = "song_name";
+    public static final String SONG_PATH = "song_path";
+    public static final String SONG_ARTIST = "song_artist";
+    public static final String IMAGE_PATH = "image_path";
+    public static final String DURATION = "duration";
+    public static final String FAVORITE = "favorite";
+    public static final String COUNT_OF_PLAY = "count";
 
-        super(context, name, factory, version, errorHandler);
+    public SongDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
+        String sql = "CREATE TABLE " + DB_TABLE + "(" +
+                ID + " INTEGER  PRIMARY KEY," +
+                ID_PROVIDER + " INTEGER," +
+                SONG_NAME + " TEXT," +
+                SONG_PATH + " TEXT," +
+                SONG_ARTIST + " TEXT," +
+                IMAGE_PATH + " TEXT," +
+                DURATION + " LONG," +
+                FAVORITE + " INTEGER," +
+                COUNT_OF_PLAY + " INTEGER);";
+        sqLiteDatabase.execSQL(sql);
     }
 
     @Override

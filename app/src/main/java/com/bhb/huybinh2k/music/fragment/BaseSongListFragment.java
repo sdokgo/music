@@ -26,6 +26,7 @@ import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
+import com.bhb.huybinh2k.music.database.FavoriteSongDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +41,13 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     protected MediaPlaybackFragment mediaPlaybackFragment;
     protected AllSongsAdapter mAdapter;
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
+    protected FavoriteSongDB favoriteSongDB;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        favoriteSongDB = new FavoriteSongDB(getContext());
         return inflater.inflate(R.layout.fragment_base_song_list, container, false);
     }
 
@@ -94,9 +96,9 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);
-                if (mList.get(position).getCountOfPlay() >= 3 && mList.get(position).getIsFavorite() == 0) {
+                if (mList.get(position).getCountOfPlay() == 3 && mList.get(position).getIsFavorite() == 0) {
                     mList.get(position).setIsFavorite(2);
-                    new StorageUtil(getContext()).storeSongList(mList);
+                    favoriteSongDB.insert(mList.get(position));
                 }
                 mActivityMusic.playAudio(position, mList);
                 mActivityMusic.setmIsPlaying(0);
@@ -146,7 +148,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
 
 
     /**
-     * Nhận BroadcastReceiver tu service
+     * Nhận BroadcastReceiver từ service
      */
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override

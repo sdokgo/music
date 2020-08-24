@@ -78,6 +78,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mRepeat = b;
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -133,9 +134,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     }
 
 
-    /**
-     * Nhận BroadcastReceiver phát bài hát mới
-     */
+//    /**
+//     * Nhận BroadcastReceiver phát bài hát mới
+//     */
 //    private BroadcastReceiver playNewSong = new BroadcastReceiver() {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
@@ -230,17 +231,20 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private void sendBroadcast(int x) {
         Intent intent = new Intent();
         intent.setAction(ActivityMusic.BROADCAST_RECEIVER);
-        if (x == 1) {
-            intent.putExtra(ActivityMusic.GET_SONG_INDEX, mSongIndexService);
-            sendBroadcast(intent);
-        } else if (x == 2) {
-            intent.putExtra(ActivityMusic.PLAY_PAUSE, 1);
-            sendBroadcast(intent);
-        } else if (x == 3) {
-            intent.putExtra(ActivityMusic.PLAY_PAUSE, 0);
-            sendBroadcast(intent);
+        switch (x){
+            case 1:
+                intent.putExtra(ActivityMusic.GET_SONG_INDEX, mSongIndexService);
+                sendBroadcast(intent);
+                break;
+            case 2:
+                intent.putExtra(ActivityMusic.PLAY_PAUSE, 1);
+                sendBroadcast(intent);
+                break;
+            case 3:
+                intent.putExtra(ActivityMusic.PLAY_PAUSE, 0);
+                sendBroadcast(intent);
+                break;
         }
-
     }
 
 
@@ -406,7 +410,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private void updateMetaData() {
         mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mActiveSongService.getArtist())
-                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mActiveSongService.getAlbumName())
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mActiveSongService.getSongName())
                 .build());
     }

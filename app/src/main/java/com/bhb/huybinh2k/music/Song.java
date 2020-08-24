@@ -7,7 +7,6 @@ public class Song implements Serializable {
     private int idProvider;
     private String songName;
     private String songPath;
-    private String albumName;
     private String imgPath;
     private String artist;
     private long duration;
@@ -54,14 +53,6 @@ public class Song implements Serializable {
 
     public void setSongPath(String songPath) {
         this.songPath = songPath;
-    }
-
-    public String getAlbumName() {
-        return albumName;
-    }
-
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
     }
 
     public String getImg() {

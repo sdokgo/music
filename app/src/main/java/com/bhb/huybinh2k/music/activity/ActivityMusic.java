@@ -97,7 +97,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
-        mList = new StorageUtil(this).loadSongListPlaying();
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mAllSongsFragment = new AllSongsFragment();
@@ -134,12 +133,12 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 switch (menuItem.getItemId()) {
                     case R.id.nav_all:
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.framesong, mAllSongsFragment)
+                                .replace(R.id.framesong, new AllSongsFragment())
                                 .commit();
                         break;
                     case R.id.nav_favorite:
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.framesong, favoriteSongsFragment)
+                                .replace(R.id.framesong, new FavoriteSongsFragment())
                                 .commit();
                         break;
                 }
@@ -240,6 +239,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật lại giao diên playbar
      */
     public void updateUIPlayBar(int i) {
+        mList = new StorageUtil(this).loadSongListPlaying();
         Song s = mList.get(i);
         if (mLayoutPlayBar.getVisibility() == View.VISIBLE) {
             updateImagePlayPause();
@@ -312,6 +312,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             if (mServiceBound) {
                 if (mIsPlaying == 1) {
                     mMediaService.stopForegroundService();
+                    new StorageUtil(ActivityMusic.this).storeSongIndex(-1);
                 }
             }
         }
@@ -328,6 +329,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 if (mIsPlaying == 1) {
                     unbindService(mServiceConnection);
                     mMediaService.stopSelf();
+                    new StorageUtil(ActivityMusic.this).storeSongIndex(-1);
                 }
             }
         }
