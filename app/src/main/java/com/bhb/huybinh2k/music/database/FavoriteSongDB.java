@@ -20,8 +20,8 @@ public class FavoriteSongDB {
 
     public void insert(Song song)
     {
+
         ContentValues values = new ContentValues();
-        values.put(SongDatabaseHelper.ID,song.getId());
         values.put(SongDatabaseHelper.ID_PROVIDER,song.getIdProvider());
         values.put(SongDatabaseHelper.SONG_NAME,song.getSongName());
         values.put(SongDatabaseHelper.SONG_PATH,song.getSongPath());
@@ -42,22 +42,23 @@ public class FavoriteSongDB {
         while (c.moveToNext())
         {
             int id = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID));
+            int idProvider = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID_PROVIDER));
             String songName = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_NAME));
             String songPath = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_PATH));
             String songArtist = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(SongDatabaseHelper.IMAGE_PATH));
             Long duration = c.getLong(c.getColumnIndex(SongDatabaseHelper.DURATION));
-            Song song = new Song(id,songName,songPath,songArtist,imagePath,duration);
+            Song song = new Song(id,idProvider,songName,songPath,songArtist,imagePath,duration);
             list.add(song);
 
         }
         return list;
     }
 
-    public void delete(int id)
+    public void delete(int idProvider)
     {
-        String whereClause = SongDatabaseHelper.ID+ "=?";
-        String whereArgs[] = {String.valueOf(id)};
+        String whereClause = SongDatabaseHelper.ID_PROVIDER+ "=?";
+        String whereArgs[] = {String.valueOf(idProvider)};
         mDatabase.delete(SongDatabaseHelper.DB_TABLE,whereClause,whereArgs);
 
     }

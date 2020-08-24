@@ -13,8 +13,9 @@ public class Song implements Serializable {
     private int isFavorite = 0;
     private int countOfPlay = 0;
 
-    public Song(int id, String songName, String songPath, String artist, String img, long duration) {
+    public Song(int id, int idProvider, String songName, String songPath, String artist, String img, long duration) {
         this.id = id;
+        this.idProvider = idProvider;
         this.songName = songName;
         this.songPath = songPath;
         this.artist = artist;
@@ -35,49 +36,31 @@ public class Song implements Serializable {
         return idProvider;
     }
 
-    public void setIdProvider(int idProvider) {
-        this.idProvider = idProvider;
-    }
 
     public String getSongName() {
         return songName;
     }
 
-    public void setSongName(String songName) {
-        this.songName = songName;
-    }
 
     public String getSongPath() {
         return songPath;
     }
 
-    public void setSongPath(String songPath) {
-        this.songPath = songPath;
-    }
 
     public String getImg() {
         return imgPath;
     }
 
-    public void setImg(String albumPath) {
-        this.imgPath = albumPath;
-    }
 
     public String getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
 
     public long getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
 
     public int getIsFavorite() {
         return isFavorite;

@@ -23,14 +23,23 @@ public class StorageUtil {
         this.mContext = context;
     }
 
-    public void storeSongList(List<Song> list) {
-        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = mPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(list);
-        editor.putString(SONG_LIST, json);
-        editor.apply();
-    }
+//    public void storeSongList(List<Song> list) {
+//        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = mPreferences.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(list);
+//        editor.putString(SONG_LIST, json);
+//        editor.apply();
+//    }
+//    public List<Song> loadSongList() {
+//        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+//        Gson gson = new Gson();
+//        String json = mPreferences.getString(SONG_LIST, null);
+//        Type type = new TypeToken<List<Song>>() {
+//        }.getType();
+//        return gson.fromJson(json, type);
+//    }
+
 
 
     public void storeSongListPlaying(List<Song> list) {
@@ -51,14 +60,7 @@ public class StorageUtil {
         return gson.fromJson(json, type);
     }
 
-    public List<Song> loadSongList() {
-        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPreferences.getString(SONG_LIST, null);
-        Type type = new TypeToken<List<Song>>() {
-        }.getType();
-        return gson.fromJson(json, type);
-    }
+
 
     public void storeSongIndex(int index) {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);

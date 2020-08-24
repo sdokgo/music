@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
@@ -47,8 +48,9 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_base_song_list, container, false);
         favoriteSongDB = new FavoriteSongDB(getContext());
-        return inflater.inflate(R.layout.fragment_base_song_list, container, false);
+        return view;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         mOrientation = getResources().getConfiguration().orientation;
         mSongIndex = new StorageUtil(getContext()).loadSongIndex();
 
-        mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList);
+
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mActivityMusic.setmIUpdateAllSongsFragment(this);
@@ -173,12 +175,15 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
      */
     @Override
     public void update(int songIndex) {
-        mAdapter.setPlayingPosition(songIndex);
-        mAdapter.notifyDataSetChanged();
-        mRecyclerView.scrollToPosition(songIndex);
+        List<Song> s = new StorageUtil(getContext()).loadSongListPlaying();
+        if (s.size() == mList.size()) {
+            mAdapter.setPlayingPosition(songIndex);
+            mAdapter.notifyDataSetChanged();
+            mRecyclerView.scrollToPosition(songIndex);
+        }
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mPlayBar.setVisibility(View.VISIBLE);
-            mActivityMusic.updateUIPlayBar(songIndex);
+            if (mSongIndex != -1) mActivityMusic.updateUIPlayBar(songIndex);
         }
     }
 

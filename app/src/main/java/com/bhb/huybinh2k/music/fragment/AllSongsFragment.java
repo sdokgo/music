@@ -47,7 +47,7 @@ public class AllSongsFragment extends BaseSongListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mList.clear();
         getSongList();
-        Toast.makeText(getContext(), mList.size()+ "", Toast.LENGTH_SHORT).show();
+        mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, false);
         super.onViewCreated(view, savedInstanceState);
         int i = new StorageUtil(getContext()).loadSongIndex();
         if (i != -1) update(i);
@@ -74,6 +74,9 @@ public class AllSongsFragment extends BaseSongListFragment {
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                     Long albumId = musicCursor.getLong(musicCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
+                    int idProvider = musicCursor.getInt(
+                            musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+
                     Uri sArtworkUri = Uri
                             .parse("content://media/external/audio/albumart");
                     Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
@@ -81,7 +84,7 @@ public class AllSongsFragment extends BaseSongListFragment {
 
                     Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
-                    mList.add(new Song(id, thisTitle, songpath, thisArtist, albumArt, milliseconds));
+                    mList.add(new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds));
                     id++;
 
                 }

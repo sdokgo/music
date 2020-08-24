@@ -77,6 +77,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mShuffle = a;
         mRepeat = b;
     }
+    public void updateListSong(List <Song> list){
+        mSongListService = list;
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -133,29 +136,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         isPlaying = 1;
     }
 
-
-//    /**
-//     * Nhận BroadcastReceiver phát bài hát mới
-//     */
-//    private BroadcastReceiver playNewSong = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            mSongIndexService = new StorageUtil(getApplicationContext()).loadSongIndex();
-//            if (mSongIndexService != -1 && mSongIndexService < mSongListService.size()) {
-//                mActiveSongService = mSongListService.get(mSongIndexService);
-//            } else {
-//                stopSelf();
-//            }
-//            stopMedia();
-//            mMediaPlayer.reset();
-//            initMediaPlayer();
-//            updateMetaData();
-//            sendBroadcast(1);
-//            buildNotification(PlaybackStatus.PLAYING);
-//        }
-//
-//    };
-
     /**
      * Khởi tạo MediaSession
      */
@@ -169,7 +149,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         updateMetaData();
-
         mMediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
             public void onPlay() {
@@ -467,16 +446,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     /**
      * loại bỏ notification
      */
-    private void removeNotification() {
+    public void removeNotification() {
         NotificationManager notificationManager = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
-    }
-
-
-    public void stopForegroundService() {
-            stopForeground(false);
-            stopSelf();
     }
 
 
@@ -540,8 +513,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @Override
     public void onCreate() {
         super.onCreate();
-//        IntentFilter intentFilter = new IntentFilter(ActivityMusic.BROADCAST_PLAY_NEW_AUDIO);
-//        registerReceiver(playNewSong, intentFilter);
     }
 
 
@@ -552,7 +523,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             stopMedia();
             mMediaPlayer.release();
         }
-//        unregisterReceiver(playNewSong);
     }
 
     @Override

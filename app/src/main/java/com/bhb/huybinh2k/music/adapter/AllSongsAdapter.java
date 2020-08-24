@@ -6,19 +6,18 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
+import com.bhb.huybinh2k.music.database.FavoriteSongDB;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -26,13 +25,14 @@ import java.util.List;
 public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
     private Context mContext;
     private int mRes;
+    private boolean isFavorite;
     private List<Song> mList;
     private int mPlayingPosition = -1;
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.list_music,parent,false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.list_music, parent, false);
         return new ViewHolder(view);
     }
 
@@ -59,7 +59,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         holder.sn.setTypeface(position == mPlayingPosition ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
         holder.imgstt.setVisibility(position == mPlayingPosition ? View.VISIBLE : View.INVISIBLE);
 
-        Song song = mList.get(position);
+        final Song song = mList.get(position);
         holder.stt.setText(song.getId() + "");
         holder.sn.setText(song.getSongName());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("m:ss");
@@ -69,22 +69,45 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         holder.imageView.setOnClickListener(new android.view.View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(mContext, v);
-                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.addToFavorite:
-                                Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
-                        }
-
-                        return false;
-                    }
-                });
-                popupMenu.show();
+                createPopupMenu(v, song);
             }
         });
+    }
+
+    private void createPopupMenu(View v, final Song song) {
+        PopupMenu popupMenu = new PopupMenu(mContext, v);
+        if (isFavorite == true) {
+            popupMenu.getMenuInflater().inflate(R.menu.remove_from_favorite, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.removeFromFavorite:
+                            new FavoriteSongDB(mContext).delete(song.getIdProvider());
+                            mList.remove(song);
+                            notifyDataSetChanged();
+                            Toast.makeText(mContext, "Remove Succes", Toast.LENGTH_SHORT).show();
+                    }
+                    return false;
+                }
+            });
+        } else {
+            popupMenu.getMenuInflater().inflate(R.menu.add_to_favorite, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.addToFavorite:
+                            new FavoriteSongDB(mContext).insert(song);
+                            Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
+                    }
+
+                    return false;
+                }
+            });
+        }
+
+        popupMenu.show();
     }
 
     @Override
@@ -107,9 +130,9 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (listener != null){
+                    if (listener != null) {
                         listener.onItemClick(itemView, getLayoutPosition());
-                        if (iOnClickSongListener!= null){
+                        if (iOnClickSongListener != null) {
                             iOnClickSongListener.update(getLayoutPosition());
                         }
                     }
@@ -119,10 +142,11 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         }
     }
 
-    public AllSongsAdapter(@NonNull Context context, int resource, @NonNull List<Song> objects) {
+    public AllSongsAdapter(@NonNull Context context, int resource, @NonNull List<Song> objects, boolean isFavorite) {
         this.mContext = context;
         this.mRes = resource;
         this.mList = objects;
+        this.isFavorite = isFavorite;
     }
 
 

@@ -21,9 +21,11 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -35,6 +37,7 @@ import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
+import com.bhb.huybinh2k.music.database.FavoriteSongDB;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,7 +47,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     private List<Song> mListPlaying = new ArrayList<>();
     private RelativeLayout mLayoutPlayBar;
     private ImageView mImageSong, mImageIcon, mImagePause, mImageShuffle, mImageRepeat;
-    private ImageView mImageNext, mImagePrev, mImageLike, mImageDislike, mImageList;
+    private ImageView mImageNext, mImagePrev, mImageLike, mImageDislike, mImageList, mImageMore;
     private TextView mSinger, mSongName, mRunTime, mDuration;
     private ActivityMusic mActivityMusic;
     private StorageUtil mStorageUtil;
@@ -63,6 +66,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mSinger = view.findViewById(R.id.tencasi_media);
         mImageIcon = view.findViewById(R.id.img_header);
         mImagePause = view.findViewById(R.id.pause);
+        mImageMore = view.findViewById(R.id.more);
         mImageNext = view.findViewById(R.id.next);
         mImagePrev = view.findViewById(R.id.prev);
         mImageLike = view.findViewById(R.id.like);
@@ -134,7 +138,12 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 clickPlayPause();
             }
         });
-
+        mImageMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addToFavorite(view);
+            }
+        });
 
         if (!mActivityMusic.isServiceBound()) {
             getSongList();
@@ -145,7 +154,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             }
 
         }
-
         if (mSongIndex != -1) {
             mListPlaying = mStorageUtil.loadSongListPlaying();
             updateUI(mSongIndex);
@@ -183,6 +191,24 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             }
         });
 
+    }
+
+    private void addToFavorite(View v){
+        PopupMenu popupMenu = new PopupMenu(getContext(),v);
+        popupMenu.getMenuInflater().inflate(R.menu.add_to_favorite, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.addToFavorite:
+                        new FavoriteSongDB(getContext()).insert(mListPlaying.get(mSongIndex));
+                        Toast.makeText(getContext(), "Add Succes", Toast.LENGTH_SHORT).show();
+                }
+
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 
 
@@ -314,6 +340,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     public void updateUI(int index) {
         mLayoutPlayBar.setVisibility(View.GONE);
         updateImagePlayPause();
+        mListPlaying = mStorageUtil.loadSongListPlaying();
         Song song = mListPlaying.get(index);
         mImageSong.setImageURI(Uri.parse(song.getImg()));
         mImageIcon.setImageURI(Uri.parse(song.getImg()));
@@ -475,6 +502,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                             musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String songpath = musicCursor.getString(
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
+                    int idProvider = musicCursor.getInt(
+                            musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
 
                     Long albumId = musicCursor.getLong(musicCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
@@ -485,7 +514,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
                     Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
-                    mListPlaying.add(new Song(id, thisTitle, songpath, thisArtist, albumArt, milliseconds));
+                    mListPlaying.add(new Song(id,idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds));
                     id++;
 
                 }

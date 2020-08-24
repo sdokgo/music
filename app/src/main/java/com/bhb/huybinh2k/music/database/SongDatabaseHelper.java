@@ -29,8 +29,8 @@ public class SongDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = "CREATE TABLE " + DB_TABLE + "(" +
-                ID + " INTEGER  PRIMARY KEY," +
-                ID_PROVIDER + " INTEGER," +
+                ID + " INTEGER  PRIMARY KEY AUTOINCREMENT," +
+                ID_PROVIDER + " INTEGER UNIQUE," +
                 SONG_NAME + " TEXT," +
                 SONG_PATH + " TEXT," +
                 SONG_ARTIST + " TEXT," +
