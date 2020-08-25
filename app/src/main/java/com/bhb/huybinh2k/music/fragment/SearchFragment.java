@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
@@ -39,7 +40,6 @@ public class SearchFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         listSerach = new StorageUtil(getContext()).loadSongList();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -63,7 +63,7 @@ public class SearchFragment extends BaseSongListFragment {
         });
         mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, false);
         super.onViewCreated(view, savedInstanceState);
-
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
         mAdapter.setOnItemClickListener(new AllSongsAdapter.OnItemClickListener() {
             @Override
@@ -78,11 +78,10 @@ public class SearchFragment extends BaseSongListFragment {
                 }
                 mActivityMusic.playAudio(index, listSerach);
                 mActivityMusic.setmIsPlaying(0);
+//                getFragmentManager().popBackStack();
                 updateUI(index);
             }
         });
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
     }
 
     public void updateUI(int songIndex) {
@@ -95,12 +94,5 @@ public class SearchFragment extends BaseSongListFragment {
                 mActivityMusic.updateUIPlayBar(songIndex);
             }
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mActivityMusic.setmIsBack(true);
-        new StorageUtil(getContext()).storeSongListPlaying(listSerach);
     }
 }

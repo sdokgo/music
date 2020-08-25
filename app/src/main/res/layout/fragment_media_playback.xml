@@ -154,13 +154,13 @@
 
                 <ImageView
                     android:id="@+id/like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="@dimen/dimen_10dp"
                     android:layout_toLeftOf="@id/prev"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_like" />
+                    android:src="@drawable/ic_thumbs_up_default" />
 
                 <ImageView
                     android:layout_marginRight="5dp"
@@ -193,14 +193,14 @@
 
                 <ImageView
                     android:id="@+id/dislike"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_centerVertical="true"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="@dimen/dimen_10dp"
                     android:layout_toRightOf="@id/next"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_dislike" />
+                    android:src="@drawable/ic_thumbs_down_default" />
             </LinearLayout>
 
         </RelativeLayout>

@@ -54,7 +54,9 @@ public class FavoriteSongsProvider extends ContentProvider {
             String songArtist = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(SongDatabaseHelper.IMAGE_PATH));
             Long duration = c.getLong(c.getColumnIndex(SongDatabaseHelper.DURATION));
-            Song song = new Song(id,idProvider,songName,songPath,songArtist,imagePath,duration);
+            int isFavorite = c.getInt(c.getColumnIndex(SongDatabaseHelper.FAVORITE));
+            int count = c.getInt(c.getColumnIndex(SongDatabaseHelper.COUNT_OF_PLAY));
+            Song song = new Song(id,idProvider,songName,songPath,imagePath,songArtist,duration,isFavorite,count);
             list.add(song);
 
         }

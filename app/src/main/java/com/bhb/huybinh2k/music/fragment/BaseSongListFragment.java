@@ -183,7 +183,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     }
 
     private IOnClickSongListener mIOnClickSongListener;
-
     public void setmIOnClickSongListener(IOnClickSongListener iOnClickSongListener) {
         this.mIOnClickSongListener = iOnClickSongListener;
         if (mAdapter != null) {

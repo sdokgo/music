@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.StorageUtil;
@@ -24,6 +25,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mList.clear();
         mList = favoriteSongsProvider.read();
+        if (mList.size()==0) Toast.makeText(getContext(), "Hãy thêm bài hát yêu thích", Toast.LENGTH_SHORT).show();
         mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, true);
         super.onViewCreated(view, savedInstanceState);
         int i = new StorageUtil(getContext()).loadSongIndex();

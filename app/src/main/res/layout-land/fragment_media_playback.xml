@@ -35,7 +35,7 @@
     </FrameLayout>
 
     <RelativeLayout
-        android:background="#C3C1C1"
+        android:background="#D5ECE8E8"
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="64dp">
@@ -65,27 +65,33 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dimen_10dp"
             android:layout_toLeftOf="@id/playlist"
             android:layout_toRightOf="@id/img_header"
             android:orientation="vertical">
 
             <TextView
-                android:singleLine="true"
+                android:layout_marginTop="@dimen/dimen_5dp"
                 android:id="@+id/tenbaihat_media"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-
-                android:textSize="@dimen/dimen_26sp" />
+                android:singleLine="true"
+                android:text="aaaaaaaaaaaaaaa"
+                android:textColor="#000000"
+                android:textStyle="normal"
+                android:textSize="18sp" />
 
             <TextView
-                android:singleLine="true"
                 android:id="@+id/tencasi_media"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="@dimen/dimen_24sp" />
+                android:singleLine="true"
+                android:text="aaaaaaaaaaaaaaa"
+                android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -93,7 +99,7 @@
 
 
     <RelativeLayout
-        android:background="#C3C1C1"
+        android:background="#D5ECE8E8"
         android:id="@+id/control_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="00:00"
-                android:textSize="@dimen/dimen_18sp" />
+                android:textSize="@dimen/dimen_14sp" />
 
             <TextView
                 android:id="@+id/song_duration"
@@ -120,7 +126,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:text="00:00"
-                android:textSize="@dimen/dimen_18sp" />
+                android:textSize="@dimen/dimen_14sp" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -130,12 +136,12 @@
 
             <ImageView
                 android:id="@+id/like"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@id/prev"
-                android:src="@drawable/ic_like" />
+                android:src="@drawable/ic_thumbs_up_default" />
 
             <ImageView
                 android:layout_centerVertical="true"
@@ -167,20 +173,24 @@
             <ImageView
                 android:layout_centerVertical="true"
                 android:id="@+id/dislike"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/next"
-                android:src="@drawable/ic_dislike" />
+                android:src="@drawable/ic_thumbs_down_default" />
         </RelativeLayout>
     </RelativeLayout>
 
-
     <SeekBar
+        android:progressTint="@color/colorOrange"
+        android:progressBackgroundTint="#000000"
         android:id="@+id/seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/control_song" />
+        android:layout_above="@id/control_song"
+        android:thumbTint="@color/colorOrange" />
+
+
 
 </RelativeLayout>

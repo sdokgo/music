@@ -120,12 +120,12 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mFavorite == 0) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
-                        mAllSongsFragment).commit();
-            } else if (mFavorite == 1) {
+            if (mFavorite == 1) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
                         new FavoriteSongsFragment()).commit();
+            } else {
+                getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
+                        mAllSongsFragment).commit();
             }
             mImagePause.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,17 +134,17 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 }
             });
         } else {
-            if (mFavorite == 0) {
-                mAllSongsFragment.setmIOnClickSongListener(this);
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.framesong, mAllSongsFragment)
-                        .replace(R.id.framesongplay, mMediaPlaybackFragment)
-                        .commit();
-            } else if (mFavorite == 1) {
+            if (mFavorite == 1) {
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
                 favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.framesong, favoriteSongsFragment)
+                        .replace(R.id.framesongplay, mMediaPlaybackFragment)
+                        .commit();
+            } else {
+                mAllSongsFragment.setmIOnClickSongListener(this);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.framesong, mAllSongsFragment)
                         .replace(R.id.framesongplay, mMediaPlaybackFragment)
                         .commit();
             }
@@ -153,9 +153,9 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
-        if (mFavorite==1){
+        if (mFavorite == 1) {
             x = R.id.nav_favorite;
-        }else {
+        } else {
             x = R.id.nav_all;
         }
         navigationView.setCheckedItem(x);
@@ -202,9 +202,9 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
             mMediaService = binder.getService();
-            if (mFavorite==0){
+            if (mFavorite == 0) {
                 mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
-            }else if (mFavorite==1){
+            } else if (mFavorite == 1) {
 
             }
             if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -392,8 +392,10 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.search) {
+            SearchFragment searchFragment = new SearchFragment();
+            searchFragment.setmIOnClickSongListener(this);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.framesong, new SearchFragment())
+                    .replace(R.id.framesong, searchFragment)
                     .addToBackStack(null)
                     .commit();
         }

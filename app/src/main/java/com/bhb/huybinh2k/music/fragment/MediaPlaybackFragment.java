@@ -152,11 +152,24 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             } else {
                 Toast.makeText(getContext(), "No music found", Toast.LENGTH_SHORT).show();
             }
-
         }
         if (mSongIndex != -1) {
             mListPlaying = mStorageUtil.loadSongListPlaying();
             updateUI(mSongIndex);
+        }
+        Song activeSong = mListPlaying.get(mSongIndex);
+        List<Song> list = new FavoriteSongsProvider(getContext()).read();
+        for (Song song : list) {
+            if (song.getIdProvider() == activeSong.getIdProvider()) {
+                switch (song.getIsFavorite()) {
+                    case 2:
+                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                        break;
+                }
+            }
+        }
+        if (activeSong.getIsFavorite()==1){
+            mImageDislike.setImageResource(R.drawable.ic_thumbs_down_selected);
         }
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -170,20 +183,21 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             });
         }
 
+
         mImageDislike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
                     case 0:
                     case 2:
                         mListPlaying.get(mSongIndex).setIsFavorite(1);
                         new FavoriteSongsProvider(getContext()).delete(mListPlaying.get(mSongIndex).getIdProvider());
-                        Toast.makeText(getContext(), "dislike", Toast.LENGTH_SHORT).show();
+                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_selected);
+                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
                         break;
                     case 1:
                         mListPlaying.get(mSongIndex).setIsFavorite(0);
-                        Toast.makeText(getContext(), "not dislike", Toast.LENGTH_SHORT).show();
+                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
                         break;
                 }
 
@@ -192,10 +206,19 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mListPlaying.get(mSongIndex).getIsFavorite() == 0) {
-                    mListPlaying.get(mSongIndex).setIsFavorite(2);
-                    new FavoriteSongsProvider(getContext()).insert(mListPlaying.get(mSongIndex));
-                    Toast.makeText(getContext(), "like", Toast.LENGTH_SHORT).show();
+                switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
+                    case 0:
+                    case 1:
+                        mListPlaying.get(mSongIndex).setIsFavorite(2);
+                        new FavoriteSongsProvider(getContext()).insert(mListPlaying.get(mSongIndex));
+                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
+                        break;
+                    case 2:
+                        mListPlaying.get(mSongIndex).setIsFavorite(0);
+                        new FavoriteSongsProvider(getContext()).delete(mListPlaying.get(mSongIndex).getIdProvider());
+                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
+                        break;
                 }
             }
         });

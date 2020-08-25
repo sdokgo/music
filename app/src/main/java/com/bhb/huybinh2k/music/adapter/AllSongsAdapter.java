@@ -60,13 +60,26 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
 //        holder.stt.setVisibility(position == mPlayingPosition ? View.INVISIBLE : View.VISIBLE);
 //        holder.sn.setTypeface(position == mPlayingPosition ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
 //        holder.imgstt.setVisibility(position == mPlayingPosition ? View.VISIBLE : View.INVISIBLE);
 
-
         final Song song = mList.get(position);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onItemClick(holder.itemView, position);
+                    if (iOnClickSongListener != null) {
+                        iOnClickSongListener.update(song.getId()-1);
+                    }
+                }
+
+            }
+        });
+
+
         if (song.getIdProvider()== mPlayingIdProvider){
             holder.stt.setVisibility(View.INVISIBLE);
             holder.sn.setTypeface(Typeface.DEFAULT_BOLD);
@@ -144,18 +157,6 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             time = (TextView) itemView.findViewById(R.id.thoigian);
             imgstt = (ImageView) itemView.findViewById(R.id.imgstt);
             imageView = (ImageView) itemView.findViewById(R.id.threedot);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onItemClick(itemView, getLayoutPosition());
-                        if (iOnClickSongListener != null) {
-                            iOnClickSongListener.update(getLayoutPosition());
-                        }
-                    }
-
-                }
-            });
         }
     }
 

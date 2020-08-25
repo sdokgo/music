@@ -11,6 +11,19 @@ public class Song implements Serializable {
     private String artist;
     private long duration;
     private int isFavorite = 0;
+
+    public Song(int id, int idProvider, String songName, String songPath, String imgPath, String artist, long duration, int isFavorite, int countOfPlay) {
+        this.id = id;
+        this.idProvider = idProvider;
+        this.songName = songName;
+        this.songPath = songPath;
+        this.imgPath = imgPath;
+        this.artist = artist;
+        this.duration = duration;
+        this.isFavorite = isFavorite;
+        this.countOfPlay = countOfPlay;
+    }
+
     private int countOfPlay = 0;
 
     public Song(int id, int idProvider, String songName, String songPath, String artist, String img, long duration) {

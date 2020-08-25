@@ -26,6 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="74dp"
                 app:titleTextAppearance="@style/Medium"/>
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <FrameLayout
