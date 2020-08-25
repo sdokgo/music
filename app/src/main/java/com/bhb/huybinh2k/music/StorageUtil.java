@@ -16,6 +16,7 @@ public class StorageUtil {
     private static final String SONG_LIST = "com.bhb.huybinh2k.SONG_LIST";
     private static final String LIST_SONG_PLAYING = "com.bhb.huybinh2k.LIST_SONG_PLAYING";
     private static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
+    private static final String IS_FAVORITE = "com.bhb.huybinh2k.IS_FAVORITE";
     private SharedPreferences mPreferences;
     private Context mContext;
 
@@ -23,22 +24,33 @@ public class StorageUtil {
         this.mContext = context;
     }
 
-//    public void storeSongList(List<Song> list) {
-//        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = mPreferences.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(list);
-//        editor.putString(SONG_LIST, json);
-//        editor.apply();
-//    }
-//    public List<Song> loadSongList() {
-//        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-//        Gson gson = new Gson();
-//        String json = mPreferences.getString(SONG_LIST, null);
-//        Type type = new TypeToken<List<Song>>() {
-//        }.getType();
-//        return gson.fromJson(json, type);
-//    }
+    public void storeSongList(List<Song> list) {
+        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(SONG_LIST, json);
+        editor.apply();
+    }
+    public List<Song> loadSongList() {
+        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPreferences.getString(SONG_LIST, null);
+        Type type = new TypeToken<List<Song>>() {
+        }.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public void storeIsFavorite(int i){
+        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(IS_FAVORITE,i);
+        editor.apply();
+    }
+    public int loadIsFavorite(){
+        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        return mPreferences.getInt(IS_FAVORITE,-1);
+    }
 
 
 

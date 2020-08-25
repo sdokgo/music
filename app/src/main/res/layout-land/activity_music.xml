@@ -56,7 +56,7 @@
 
             <ImageView
                 android:id="@+id/img_playbar"
-                android:layout_width="50dp"
+                android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/music" />

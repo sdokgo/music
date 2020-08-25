@@ -1,11 +1,9 @@
 package com.bhb.huybinh2k.music.database;
 
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.Nullable;
 
 public class SongDatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;

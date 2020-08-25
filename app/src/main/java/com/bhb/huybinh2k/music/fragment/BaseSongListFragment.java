@@ -14,12 +14,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
@@ -27,7 +25,7 @@ import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
-import com.bhb.huybinh2k.music.database.FavoriteSongDB;
+import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +40,14 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     protected MediaPlaybackFragment mediaPlaybackFragment;
     protected AllSongsAdapter mAdapter;
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
-    protected FavoriteSongDB favoriteSongDB;
+    protected FavoriteSongsProvider favoriteSongsProvider;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_base_song_list, container, false);
-        favoriteSongDB = new FavoriteSongDB(getContext());
+        favoriteSongsProvider = new FavoriteSongsProvider(getContext());
         return view;
     }
 
@@ -63,14 +61,13 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         mOrientation = getResources().getConfiguration().orientation;
         mSongIndex = new StorageUtil(getContext()).loadSongIndex();
 
-
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mActivityMusic.setmIUpdateAllSongsFragment(this);
 
         if (savedInstanceState != null) {
             mSongIndex = savedInstanceState.getInt(SONG_INDEX);
-            update(mSongIndex);
+            if (mSongIndex != -1) update(mSongIndex);
         }
         mediaPlaybackFragment = new MediaPlaybackFragment();
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -83,15 +80,20 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 }
             });
             if (mReplace == true) {
-                update(mSongIndex);
+                if (mSongIndex != -1) update(mSongIndex);
                 mReplace = false;
+                mList = new StorageUtil(getContext()).loadSongListPlaying();
             }
         } else {
             update(mSongIndex);
             mRecyclerView.scrollToPosition(mSongIndex);
             mAdapter.setiOnClickSongListener(mIOnClickSongListener);
         }
+    }
 
+
+
+    public void clickSong(){
         mAdapter.setOnItemClickListener(new AllSongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
@@ -100,7 +102,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mList.get(position).setCountOfPlay(++countOfPlay);
                 if (mList.get(position).getCountOfPlay() == 3 && mList.get(position).getIsFavorite() == 0) {
                     mList.get(position).setIsFavorite(2);
-                    favoriteSongDB.insert(mList.get(position));
+                    favoriteSongsProvider.insert(mList.get(position));
                 }
                 mActivityMusic.playAudio(position, mList);
                 mActivityMusic.setmIsPlaying(0);
@@ -108,19 +110,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
             }
         });
     }
-
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
 
     @Override
     public void onStart() {
@@ -175,15 +164,21 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
      */
     @Override
     public void update(int songIndex) {
-        List<Song> s = new StorageUtil(getContext()).loadSongListPlaying();
-        if (s.size() == mList.size()) {
-            mAdapter.setPlayingPosition(songIndex);
-            mAdapter.notifyDataSetChanged();
-            mRecyclerView.scrollToPosition(songIndex);
+        if (songIndex!= -1){
+            List<Song> s = new StorageUtil(getContext()).loadSongListPlaying();
+            if (s.size() == mList.size()) {
+//            mAdapter.setPlayingPosition(songIndex);
+                mAdapter.setmPlayingIdProvider(mList.get(songIndex).getIdProvider());
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.scrollToPosition(songIndex);
+            }
         }
+
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            mPlayBar.setVisibility(View.VISIBLE);
-            if (mSongIndex != -1) mActivityMusic.updateUIPlayBar(songIndex);
+            if (mSongIndex != -1){
+                mPlayBar.setVisibility(View.VISIBLE);
+                mActivityMusic.updateUIPlayBar(songIndex);
+            }
         }
     }
 

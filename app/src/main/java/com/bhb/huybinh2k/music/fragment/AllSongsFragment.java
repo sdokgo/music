@@ -40,17 +40,20 @@ public class AllSongsFragment extends BaseSongListFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("log", "onCreateViewAllSongsFragment");
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d("log", "onCreateViewAllSongsFragment");
         mList.clear();
         getSongList();
         mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, false);
         super.onViewCreated(view, savedInstanceState);
         int i = new StorageUtil(getContext()).loadSongIndex();
         if (i != -1) update(i);
+        clickSong();
     }
 
     /**
@@ -91,6 +94,18 @@ public class AllSongsFragment extends BaseSongListFragment {
                 while (musicCursor.moveToNext());
             }
         }
+        new StorageUtil(getContext()).storeSongList(mList);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("log", "onStartAllSongsFragment");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("log", "onStopAllSongsFragment");
+    }
 }

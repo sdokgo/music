@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
-import com.bhb.huybinh2k.music.database.FavoriteSongDB;
+import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -28,6 +28,12 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
     private boolean isFavorite;
     private List<Song> mList;
     private int mPlayingPosition = -1;
+
+    public void setmPlayingIdProvider(int mPlayingIdProvider) {
+        this.mPlayingIdProvider = mPlayingIdProvider;
+    }
+
+    private int mPlayingIdProvider =-1;
 
     @NonNull
     @Override
@@ -55,11 +61,22 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.stt.setVisibility(position == mPlayingPosition ? View.INVISIBLE : View.VISIBLE);
-        holder.sn.setTypeface(position == mPlayingPosition ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-        holder.imgstt.setVisibility(position == mPlayingPosition ? View.VISIBLE : View.INVISIBLE);
+//        holder.stt.setVisibility(position == mPlayingPosition ? View.INVISIBLE : View.VISIBLE);
+//        holder.sn.setTypeface(position == mPlayingPosition ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+//        holder.imgstt.setVisibility(position == mPlayingPosition ? View.VISIBLE : View.INVISIBLE);
+
 
         final Song song = mList.get(position);
+        if (song.getIdProvider()== mPlayingIdProvider){
+            holder.stt.setVisibility(View.INVISIBLE);
+            holder.sn.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.imgstt.setVisibility(View.VISIBLE);
+        }else {
+            holder.stt.setVisibility(View.VISIBLE);
+            holder.sn.setTypeface(Typeface.DEFAULT);
+            holder.imgstt.setVisibility(View.INVISIBLE);
+        }
+
         holder.stt.setText(song.getId() + "");
         holder.sn.setText(song.getSongName());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("m:ss");
@@ -83,7 +100,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.removeFromFavorite:
-                            new FavoriteSongDB(mContext).delete(song.getIdProvider());
+                            new FavoriteSongsProvider(mContext).delete(song.getIdProvider());
                             mList.remove(song);
                             notifyDataSetChanged();
                             Toast.makeText(mContext, "Remove Succes", Toast.LENGTH_SHORT).show();
@@ -98,7 +115,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                 public boolean onMenuItemClick(MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.addToFavorite:
-                            new FavoriteSongDB(mContext).insert(song);
+                            new FavoriteSongsProvider(mContext).insert(song);
                             Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
                     }
 
