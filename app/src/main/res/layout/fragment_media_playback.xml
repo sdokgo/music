@@ -17,6 +17,7 @@
             android:layout_centerVertical="true">
 
             <ImageView
+                android:contentDescription="big image song"
                 android:id="@+id/img_song"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -24,6 +25,7 @@
                 android:src="@drawable/music" />
 
             <ImageView
+                android:contentDescription="repeat"
                 android:id="@+id/repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,6 +34,7 @@
                 android:src="@drawable/ic_repeat_white" />
 
             <ImageView
+                android:contentDescription="shuffle"
                 android:id="@+id/shuffle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -49,12 +52,14 @@
             android:layout_margin="@dimen/dimen_10dp">
 
             <ImageView
+                android:contentDescription="small image song"
                 android:id="@+id/img_header"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:src="@drawable/music" />
 
             <ImageView
+                android:contentDescription="back to list"
                 android:id="@+id/playlist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -64,6 +69,7 @@
                 android:src="@drawable/ic_queue_music" />
 
             <ImageView
+                android:contentDescription="menu"
                 android:id="@+id/more"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -87,7 +93,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:singleLine="true"
-                    android:text="aaaaaaaaaaaaaaa"
                     android:textColor="#000000"
                     android:textStyle="normal"
                     android:textSize="18sp" />
@@ -98,7 +103,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:singleLine="true"
-                    android:text="aaaaaaaaaaaaaaa"
                     android:textSize="14sp" />
             </LinearLayout>
         </RelativeLayout>
@@ -125,7 +129,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="@dimen/dimen_10dp"
-                android:text="00:00"
                 android:textSize="14sp" />
 
             <TextView
@@ -135,7 +138,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/dimen_10dp"
-                android:text="00:00"
                 android:textSize="14sp" />
 
         </RelativeLayout>
@@ -153,6 +155,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:contentDescription="like"
                     android:id="@+id/like"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
@@ -163,6 +166,7 @@
                     android:src="@drawable/ic_thumbs_up_default" />
 
                 <ImageView
+                    android:contentDescription="previous song"
                     android:layout_marginRight="5dp"
                     android:id="@+id/prev"
                     android:layout_width="wrap_content"
@@ -173,6 +177,7 @@
                     android:src="@drawable/ic_previous" />
 
                 <ImageView
+                    android:contentDescription="play pause"
                     android:id="@+id/pause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -181,6 +186,7 @@
 
 
                 <ImageView
+                    android:contentDescription="next song"
                     android:layout_marginLeft="@dimen/dimen_5dp"
                     android:id="@+id/next"
                     android:layout_width="wrap_content"
@@ -192,6 +198,7 @@
                     android:src="@drawable/ic_next" />
 
                 <ImageView
+                    android:contentDescription="dislike"
                     android:id="@+id/dislike"
                     android:layout_width="32dp"
                     android:layout_height="32dp"

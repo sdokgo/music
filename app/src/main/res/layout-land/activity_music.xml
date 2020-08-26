@@ -55,6 +55,7 @@
             android:visibility="gone">
 
             <ImageView
+                android:contentDescription="song image"
                 android:id="@+id/img_playbar"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
@@ -62,6 +63,7 @@
                 android:src="@drawable/music" />
 
             <ImageView
+                android:contentDescription="button play pause"
                 android:id="@+id/playBar_Pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -84,7 +86,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:text="Ten Bai hat"
                     android:textColor="#000000"
                     android:textSize="@dimen/dimen_18sp" />
 
@@ -94,7 +95,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tenbaihat_playbar"
                     android:singleLine="true"
-                    android:text="ten ca si"
                     android:textSize="@dimen/dimen_14sp" />
             </RelativeLayout>
         </RelativeLayout>

@@ -10,9 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
+
 
 public class FavoriteSongsFragment extends BaseSongListFragment {
 
@@ -24,9 +24,9 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mList.clear();
-        mList = favoriteSongsProvider.read();
+        mList = favoriteSongsProvider.listFavorite();
         if (mList.size()==0) Toast.makeText(getContext(), "Hãy thêm bài hát yêu thích", Toast.LENGTH_SHORT).show();
-        mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, true);
+        mAdapter = new AllSongsAdapter(getContext(), mList, true);
         super.onViewCreated(view, savedInstanceState);
         int i = new StorageUtil(getContext()).loadSongIndex();
         if (i != -1) update(i);

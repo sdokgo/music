@@ -4,10 +4,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -67,7 +65,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private MediaControllerCompat.TransportControls mTransportControls;
     private int mShuffle, mRepeat;
     private int mResumePosition;
-    private StorageUtil mStorageUtil;
 
 
     /**
@@ -88,7 +85,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         try {
 
             createNotificationChannel();
-            mStorageUtil = new StorageUtil(getApplicationContext());
+            StorageUtil mStorageUtil = new StorageUtil(getApplicationContext());
             mSongListService = mStorageUtil.loadSongListPlaying();
             mSongIndexService = mStorageUtil.loadSongIndex();
             mShuffle = mStorageUtil.loadShuffle();
@@ -507,12 +504,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } else if (actionString.equalsIgnoreCase(ACTION_PREVIOUS)) {
             mTransportControls.skipToPrevious();
         }
-    }
-
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
     }
 
 

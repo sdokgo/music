@@ -6,11 +6,11 @@
         <item
             android:icon="@drawable/ic_queue_music"
             android:id="@+id/nav_all"
-            android:title="All Song" />
+            android:title="@string/all_song" />
         <item
             android:icon="@drawable/ic_favorite"
             android:id="@+id/nav_favorite"
-            android:title="Favorite Song" />
+            android:title="@string/favorite_song" />
     </group>
 <!--    <item android:title="Communicate">-->
 <!--        <menu>-->

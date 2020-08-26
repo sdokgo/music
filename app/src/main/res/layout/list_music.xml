@@ -31,7 +31,7 @@
                 android:layout_margin="1dp"
                 android:gravity="center"
                 android:textSize="@dimen/dimen_14sp"
-                android:text="1"
+
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </RelativeLayout>
@@ -52,7 +52,7 @@
                 android:textColor="#000000"
                 android:textSize="@dimen/dimen_18sp"
                 android:id="@+id/tenbaihat"
-                android:text="Ten bai hat"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <TextView
@@ -60,7 +60,7 @@
                 android:textStyle="normal"
                 android:textSize="14sp"
                 android:id="@+id/thoigian"
-                android:text="0:00"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
         </LinearLayout>

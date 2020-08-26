@@ -8,7 +8,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 
 import android.app.ActivityManager;
-import android.app.AliasActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,7 +25,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.MediaPlaybackService;
@@ -60,7 +58,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private boolean mServiceBound = false;
     private int mOrientation;
     private StorageUtil storageUtil;
-    private androidx.appcompat.widget.Toolbar mToolbar;
+
     private MediaPlaybackFragment mMediaPlaybackFragment;
     private AllSongsFragment mAllSongsFragment;
 
@@ -100,7 +98,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
-        mToolbar = findViewById(R.id.toolbar);
+        androidx.appcompat.widget.Toolbar mToolbar;mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mAllSongsFragment = new AllSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
@@ -358,7 +356,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public void onBackPressed() {
         Log.d("log", "BackPressed");
         super.onBackPressed();
-        if (mIsBack != true) {
+        if (!mIsBack) {
             if (mServiceBound) {
                 if (mIsPlaying == 1) {
                     unbindService(mServiceConnection);

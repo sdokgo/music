@@ -12,6 +12,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
+            android:contentDescription="big image song"
             android:scaleType="fitXY"
             android:id="@+id/img_song"
             android:layout_width="match_parent"
@@ -19,6 +20,7 @@
             android:src="@drawable/music"/>
 
         <ImageView
+            android:contentDescription="repeat"
             android:layout_margin="@dimen/dimen_10dp"
             android:id="@+id/repeat"
             android:layout_gravity="bottom|left"
@@ -26,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <ImageView
+            android:contentDescription="shuffle"
             android:layout_margin="@dimen/dimen_10dp"
             android:layout_gravity="bottom|right"
             android:id="@+id/shuffle"
@@ -40,6 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp">
         <ImageView
+            android:contentDescription="small image song"
             android:scaleType="fitXY"
             android:id="@+id/img_header"
             android:layout_width="64dp"
@@ -79,7 +83,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:text="aaaaaaaaaaaaaaa"
                 android:textColor="#000000"
                 android:textStyle="normal"
                 android:textSize="18sp" />
@@ -90,7 +93,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:text="aaaaaaaaaaaaaaa"
                 android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
@@ -116,7 +118,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="00:00"
                 android:textSize="@dimen/dimen_14sp" />
 
             <TextView
@@ -125,7 +126,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:text="00:00"
                 android:textSize="@dimen/dimen_14sp" />
         </RelativeLayout>
 
@@ -135,6 +135,7 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:contentDescription="like"
                 android:id="@+id/like"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -144,6 +145,7 @@
                 android:src="@drawable/ic_thumbs_up_default" />
 
             <ImageView
+                android:contentDescription="previous"
                 android:layout_centerVertical="true"
                 android:id="@+id/prev"
                 android:layout_width="wrap_content"
@@ -153,6 +155,7 @@
                 android:src="@drawable/ic_previous" />
 
             <ImageView
+                android:contentDescription="play pause"
                 android:id="@+id/pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -162,6 +165,7 @@
 
 
             <ImageView
+                android:contentDescription="next"
                 android:layout_centerVertical="true"
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
@@ -171,6 +175,7 @@
                 android:src="@drawable/ic_next" />
 
             <ImageView
+                android:contentDescription="dislike"
                 android:layout_centerVertical="true"
                 android:id="@+id/dislike"
                 android:layout_width="32dp"

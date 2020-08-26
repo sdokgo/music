@@ -26,12 +26,13 @@ import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
+import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpdateAllSongsFragment {
-    protected List<Song> mList = new ArrayList<>(), mFavoriteList = new ArrayList<>();
+    protected List<Song> mList = new ArrayList<>();
     protected RecyclerView mRecyclerView;
     protected ActivityMusic mActivityMusic;
     protected RelativeLayout mPlayBar;
@@ -79,7 +80,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                             .addToBackStack("allsongsfragment").commit();
                 }
             });
-            if (mReplace == true) {
+            if (mReplace) {
                 if (mSongIndex != -1) update(mSongIndex);
                 mReplace = false;
                 mList = new StorageUtil(getContext()).loadSongListPlaying();
@@ -102,7 +103,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mList.get(position).setCountOfPlay(++countOfPlay);
                 if (mList.get(position).getCountOfPlay() == 3 && mList.get(position).getIsFavorite() == 0) {
                     mList.get(position).setIsFavorite(2);
-                    favoriteSongsProvider.insert(mList.get(position));
+                    favoriteSongsProvider.update(mList.get(position));
                 }
                 mActivityMusic.playAudio(position, mList);
                 mActivityMusic.setmIsPlaying(0);
@@ -118,7 +119,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         intentFilter.addAction(mActivityMusic.BROADCAST_RECEIVER);
         getActivity().registerReceiver(broadcastReceiver, intentFilter);
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mLockScreen == true) {
+            if (mLockScreen) {
                 mSongIndex = new StorageUtil(getContext()).loadSongIndex();
                 update(mSongIndex);
                 mRecyclerView.scrollToPosition(mSongIndex);

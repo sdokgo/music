@@ -24,7 +24,6 @@ import java.util.List;
 
 public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
     private Context mContext;
-    private int mRes;
     private boolean isFavorite;
     private List<Song> mList;
     private int mPlayingPosition = -1;
@@ -33,7 +32,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         this.mPlayingIdProvider = mPlayingIdProvider;
     }
 
-    private int mPlayingIdProvider =-1;
+    private int mPlayingIdProvider = -1;
 
     @NonNull
     @Override
@@ -72,7 +71,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                 if (listener != null) {
                     listener.onItemClick(holder.itemView, position);
                     if (iOnClickSongListener != null) {
-                        iOnClickSongListener.update(song.getId()-1);
+                        iOnClickSongListener.update(song.getId() - 1);
                     }
                 }
 
@@ -80,17 +79,17 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         });
 
 
-        if (song.getIdProvider()== mPlayingIdProvider){
+        if (song.getIdProvider() == mPlayingIdProvider) {
             holder.stt.setVisibility(View.INVISIBLE);
             holder.sn.setTypeface(Typeface.DEFAULT_BOLD);
             holder.imgstt.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             holder.stt.setVisibility(View.VISIBLE);
             holder.sn.setTypeface(Typeface.DEFAULT);
             holder.imgstt.setVisibility(View.INVISIBLE);
         }
 
-        holder.stt.setText(song.getId() + "");
+        holder.stt.setText(String.valueOf(song.getId()));
         holder.sn.setText(song.getSongName());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("m:ss");
         String duration = simpleDateFormat.format(song.getDuration());
@@ -106,17 +105,17 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
     private void createPopupMenu(View v, final Song song) {
         PopupMenu popupMenu = new PopupMenu(mContext, v);
-        if (isFavorite == true) {
+        if (isFavorite) {
             popupMenu.getMenuInflater().inflate(R.menu.remove_from_favorite, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.removeFromFavorite:
-                            new FavoriteSongsProvider(mContext).delete(song.getIdProvider());
-                            mList.remove(song);
-                            notifyDataSetChanged();
-                            Toast.makeText(mContext, "Remove Succes", Toast.LENGTH_SHORT).show();
+                    if (item.getItemId() == R.id.removeFromFavorite) {
+                        song.setIsFavorite(0);
+                        new FavoriteSongsProvider(mContext).update(song);
+                        mList.remove(song);
+                        notifyDataSetChanged();
+                        Toast.makeText(mContext, "Remove Succes", Toast.LENGTH_SHORT).show();
                     }
                     return false;
                 }
@@ -126,12 +125,11 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.addToFavorite:
-                            new FavoriteSongsProvider(mContext).insert(song);
-                            Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
+                    if (item.getItemId() == R.id.addToFavorite) {
+                        song.setIsFavorite(2);
+                        new FavoriteSongsProvider(mContext).update(song);
+                        Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
                     }
-
                     return false;
                 }
             });
@@ -145,7 +143,7 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         return mList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView stt, sn, time;
         private ImageView imgstt, imageView;
@@ -160,9 +158,8 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         }
     }
 
-    public AllSongsAdapter(@NonNull Context context, int resource, @NonNull List<Song> objects, boolean isFavorite) {
+    public AllSongsAdapter(@NonNull Context context, @NonNull List<Song> objects, boolean isFavorite) {
         this.mContext = context;
-        this.mRes = resource;
         this.mList = objects;
         this.isFavorite = isFavorite;
     }

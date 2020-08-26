@@ -1,40 +1,24 @@
 package com.bhb.huybinh2k.music.fragment;
 
-import android.content.BroadcastReceiver;
+
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Configuration;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import com.bhb.huybinh2k.music.IOnClickSongListener;
-import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
-import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
+import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class AllSongsFragment extends BaseSongListFragment {
 
@@ -49,7 +33,8 @@ public class AllSongsFragment extends BaseSongListFragment {
         Log.d("log", "onCreateViewAllSongsFragment");
         mList.clear();
         getSongList();
-        mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, false);
+        mList = favoriteSongsProvider.listAllSongs();
+        mAdapter = new AllSongsAdapter(getContext(), mList, false);
         super.onViewCreated(view, savedInstanceState);
         int i = new StorageUtil(getContext()).loadSongIndex();
         if (i != -1) update(i);
@@ -60,7 +45,6 @@ public class AllSongsFragment extends BaseSongListFragment {
      * Đọc dữ liệu trong máy và add vào list
      */
     public void getSongList() {
-        mList.clear();
         ContentResolver musicResolver = getActivity().getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
@@ -86,15 +70,15 @@ public class AllSongsFragment extends BaseSongListFragment {
                     String albumArt = String.valueOf(albumArtUri);
 
                     Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-
-                    mList.add(new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds));
+                    favoriteSongsProvider.insert(
+                            new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds)
+                    );
                     id++;
 
                 }
                 while (musicCursor.moveToNext());
             }
         }
-        new StorageUtil(getContext()).storeSongList(mList);
     }
 
     @Override

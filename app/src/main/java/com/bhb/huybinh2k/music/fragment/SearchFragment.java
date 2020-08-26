@@ -6,23 +6,18 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
-
-import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
-import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
+import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,19 +35,22 @@ public class SearchFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        listSerach = new StorageUtil(getContext()).loadSongList();
+        listSerach = favoriteSongsProvider.listAllSongs();
+
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mList.clear();
-                for (Song song : listSerach) {
-                    if (song.getSongName().equalsIgnoreCase(s)
-                            || song.getSongName().contains(s)) mList.add(song);
+                List<Song> list = new FavoriteSongsProvider(getContext()).search(s);
+                for (Song song : list) {
+                    mList.add(song);
                 }
+//                mList = new FavoriteSongsProvider(getContext()).search(s);
                 if (mList.size() == 0) {
                     Toast.makeText(getContext(), "Không tìm thấy bài hát cần tìm", Toast.LENGTH_SHORT).show();
                 }
-                if (mAdapter != null) mAdapter.notifyDataSetChanged();
+                mAdapter.notifyDataSetChanged();
                 return false;
             }
 
@@ -61,7 +59,7 @@ public class SearchFragment extends BaseSongListFragment {
                 return false;
             }
         });
-        mAdapter = new AllSongsAdapter(getContext(), R.layout.list_music, mList, false);
+        mAdapter = new AllSongsAdapter(getContext(), mList, false);
         super.onViewCreated(view, savedInstanceState);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
@@ -74,7 +72,7 @@ public class SearchFragment extends BaseSongListFragment {
                 mList.get(position).setCountOfPlay(++countOfPlay);
                 if (mList.get(position).getCountOfPlay() == 3 && mList.get(position).getIsFavorite() == 0) {
                     mList.get(position).setIsFavorite(2);
-                    favoriteSongsProvider.insert(mList.get(position));
+                    favoriteSongsProvider.update(mList.get(position));
                 }
                 mActivityMusic.playAudio(index, listSerach);
                 mActivityMusic.setmIsPlaying(0);
