@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bhb.huybinh2k.music.R;
@@ -26,6 +27,7 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.splash_screen);
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -79,7 +81,7 @@ public class SplashScreen extends AppCompatActivity {
                             musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String songpath = musicCursor.getString(
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                    Long albumId = musicCursor.getLong(musicCursor
+                    long albumId = musicCursor.getLong(musicCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
                     int idProvider = musicCursor.getInt(
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
@@ -89,7 +91,7 @@ public class SplashScreen extends AppCompatActivity {
                     Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
                     String albumArt = String.valueOf(albumArtUri);
 
-                    Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+                    long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                     new FavoriteSongsProvider(this).insert(
                             new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds)
                     );
@@ -99,10 +101,11 @@ public class SplashScreen extends AppCompatActivity {
                 while (musicCursor.moveToNext());
             }
         }
+        musicCursor.close();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

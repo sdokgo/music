@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
-import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.adapter.SongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 
@@ -79,17 +77,12 @@ public class SearchFragment extends BaseSongListFragment {
                 getFragmentManager().popBackStack();
                 if (mActivityMusic.getmFavorite() == 1) {
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.framesong, new AllSongsFragment())
+                            .replace(R.id.frame_song, new AllSongsFragment())
                             .commit();
                 }
 //                updateUI(index);
             }
         });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     //    public void updateUI(int songIndex) {

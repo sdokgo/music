@@ -1,13 +1,10 @@
 package com.bhb.huybinh2k.music.fragment;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,7 +15,6 @@ import androidx.fragment.app.Fragment;
 
 
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -46,12 +42,26 @@ import java.util.List;
 public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUpdateMediaPlaybackFragment {
     private List<Song> mListPlaying = new ArrayList<>();
     private RelativeLayout mLayoutPlayBar;
-    private ImageView mImageSong, mImageIcon, mImagePause, mImageShuffle, mImageRepeat;
-    private ImageView mImageNext, mImagePrev, mImageLike, mImageDislike, mImageList, mImageMore;
-    private TextView mSinger, mSongName, mRunTime, mDuration;
+    private ImageView mImageSong,
+            mImageIcon,
+            mImagePause,
+            mImageShuffle,
+            mImageRepeat;
+    private ImageView mImageNext,
+            mImagePrev,
+            mImageLike,
+            mImageDislike,
+            mImageMore;
+    private TextView mSinger,
+            mSongName,
+            mRunTime,
+            mDuration;
     private ActivityMusic mActivityMusic;
     private StorageUtil mStorageUtil;
-    private int mSongIndex, mOrientation, mShuffle, mRepeat;
+    private int mSongIndex,
+            mOrientation,
+            mShuffle,
+            mRepeat;
     private boolean mLockScreen = false;
     private SeekBar mSeekBar;
     private SimpleDateFormat mDateFormat = new SimpleDateFormat("mm:ss");
@@ -164,7 +174,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-            mImageList = view.findViewById(R.id.playlist);
+            ImageView mImageList = view.findViewById(R.id.playlist);
             mImageList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -411,7 +421,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     /**
      * Nhận broadcastReceiver
      */
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             mSongIndex = intent.getIntExtra(ActivityMusic.GET_SONG_INDEX, -1);
@@ -471,7 +481,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         Log.d("log", "onStartMediaPlaybackFragment");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ActivityMusic.BROADCAST_RECEIVER);
-        getActivity().registerReceiver(broadcastReceiver, intentFilter);
+        getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             if (mLockScreen) {
@@ -505,7 +515,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     public void onStop() {
         super.onStop();
         Log.d("log", "onStopMediaPlaybackFragment");
-        getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override

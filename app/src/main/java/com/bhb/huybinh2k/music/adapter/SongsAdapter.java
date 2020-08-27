@@ -40,12 +40,12 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    private IOnClickSongListener iOnClickSongListener;
+    private IOnClickSongListener mIOnClickSongListener;
 
-    private static OnItemClickListener listener;
+    private OnItemClickListener mListener;
 
-    public void setiOnClickSongListener(IOnClickSongListener iOnClickSongListener) {
-        this.iOnClickSongListener = iOnClickSongListener;
+    public void setmIOnClickSongListener(IOnClickSongListener mIOnClickSongListener) {
+        this.mIOnClickSongListener = mIOnClickSongListener;
     }
 
 
@@ -54,7 +54,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.mListener = listener;
     }
 
     @Override
@@ -63,10 +63,10 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (listener != null) {
-                    listener.onItemClick(holder.itemView, position);
-                    if (iOnClickSongListener != null) {
-                        iOnClickSongListener.update(song.getId() - 1);
+                if (mListener != null) {
+                    mListener.onItemClick(holder.itemView, position);
+                    if (mIOnClickSongListener != null) {
+                        mIOnClickSongListener.update(song.getId() - 1);
                     }
                 }
             }
@@ -75,16 +75,16 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
         if (song.getIdProvider() == mPlayingIdProvider) {
             holder.stt.setVisibility(View.INVISIBLE);
-            holder.sn.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.songName.setTypeface(Typeface.DEFAULT_BOLD);
             holder.imgstt.setVisibility(View.VISIBLE);
         } else {
             holder.stt.setVisibility(View.VISIBLE);
-            holder.sn.setTypeface(Typeface.DEFAULT);
+            holder.songName.setTypeface(Typeface.DEFAULT);
             holder.imgstt.setVisibility(View.INVISIBLE);
         }
 
         holder.stt.setText(String.valueOf(song.getId()));
-        holder.sn.setText(song.getSongName());
+        holder.songName.setText(song.getSongName());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("m:ss");
         String duration = simpleDateFormat.format(song.getDuration());
 
@@ -139,16 +139,16 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView stt, sn, time;
+        private TextView stt, songName, time;
         private ImageView imgstt, imageView;
 
         public ViewHolder(@NonNull final View itemView) {
             super(itemView);
-            stt = (TextView) itemView.findViewById(R.id.textstt);
-            sn = (TextView) itemView.findViewById(R.id.tenbaihat);
-            time = (TextView) itemView.findViewById(R.id.thoigian);
-            imgstt = (ImageView) itemView.findViewById(R.id.imgstt);
-            imageView = (ImageView) itemView.findViewById(R.id.threedot);
+            stt =itemView.findViewById(R.id.textstt);
+            songName =itemView.findViewById(R.id.tenbaihat);
+            time = itemView.findViewById(R.id.thoigian);
+            imgstt = itemView.findViewById(R.id.imgstt);
+            imageView =itemView.findViewById(R.id.threedot);
         }
     }
 

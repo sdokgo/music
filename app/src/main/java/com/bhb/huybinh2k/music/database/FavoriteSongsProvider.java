@@ -6,8 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -16,11 +14,10 @@ import com.bhb.huybinh2k.music.Song;
 import java.util.ArrayList;
 
 public class FavoriteSongsProvider extends ContentProvider {
-    private Context mContext;
     private SQLiteDatabase mDatabase;
 
-    public FavoriteSongsProvider(Context mContext) {
-        this.mContext = mContext;
+    public FavoriteSongsProvider(Context context) {
+        Context mContext = context;
         SongDatabaseHelper helper = new SongDatabaseHelper(mContext);
         this.mDatabase = helper.getWritableDatabase();
     }
@@ -65,12 +62,13 @@ public class FavoriteSongsProvider extends ContentProvider {
             String songPath = c.getString(c.getColumnIndex(SONG_PATH));
             String songArtist = c.getString(c.getColumnIndex(SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(IMAGE_PATH));
-            Long duration = c.getLong(c.getColumnIndex(DURATION));
+            long duration = c.getLong(c.getColumnIndex(DURATION));
             int isFavorite = c.getInt(c.getColumnIndex(FAVORITE));
             int count = c.getInt(c.getColumnIndex(COUNT_OF_PLAY));
             Song song = new Song(id,idProvider,songName,songPath,imagePath,songArtist,duration,isFavorite,count);
             list.add(song);
         }
+        c.close();
         return list;
     }
     public ArrayList<Song> searchSongByName(String s)
@@ -88,12 +86,13 @@ public class FavoriteSongsProvider extends ContentProvider {
             String songPath = c.getString(c.getColumnIndex(SONG_PATH));
             String songArtist = c.getString(c.getColumnIndex(SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(IMAGE_PATH));
-            Long duration = c.getLong(c.getColumnIndex(DURATION));
+            long duration = c.getLong(c.getColumnIndex(DURATION));
             int isFavorite = c.getInt(c.getColumnIndex(FAVORITE));
             int count = c.getInt(c.getColumnIndex(COUNT_OF_PLAY));
             Song song = new Song(id,idProvider,songName,songPath,imagePath,songArtist,duration,isFavorite,count);
             list.add(song);
         }
+        c.close();
         return list;
     }
 
@@ -111,12 +110,13 @@ public class FavoriteSongsProvider extends ContentProvider {
             String songPath = c.getString(c.getColumnIndex(SONG_PATH));
             String songArtist = c.getString(c.getColumnIndex(SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(IMAGE_PATH));
-            Long duration = c.getLong(c.getColumnIndex(DURATION));
+            long duration = c.getLong(c.getColumnIndex(DURATION));
             int isFavorite = c.getInt(c.getColumnIndex(FAVORITE));
             int count = c.getInt(c.getColumnIndex(COUNT_OF_PLAY));
             Song song = new Song(id,idProvider,songName,songPath,imagePath,songArtist,duration,isFavorite,count);
             list.add(song);
         }
+        c.close();
         return list;
     }
 
@@ -133,11 +133,12 @@ public class FavoriteSongsProvider extends ContentProvider {
             String songPath = c.getString(c.getColumnIndex(SONG_PATH));
             String songArtist = c.getString(c.getColumnIndex(SONG_ARTIST));
             String imagePath = c.getString(c.getColumnIndex(IMAGE_PATH));
-            Long duration = c.getLong(c.getColumnIndex(DURATION));
+            long duration = c.getLong(c.getColumnIndex(DURATION));
             int isFavorite = c.getInt(c.getColumnIndex(FAVORITE));
             int count = c.getInt(c.getColumnIndex(COUNT_OF_PLAY));
             song = new Song(id,idProvider,songName,songPath,imagePath,songArtist,duration,isFavorite,count);
         }
+        c.close();
         return song;
     }
 

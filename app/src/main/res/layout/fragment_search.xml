@@ -1,28 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragment.SearchFragment">
-    <RelativeLayout
+
+    <SearchView
+        android:id="@+id/searchview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <SearchView
-            android:id="@+id/searchview"
-            android:theme="@style/TextWhite"
-            android:background="@color/colorOrange"
-            android:queryHint="Nhập bài hát bạn muốn tìm kiếm"
-            android:layout_width="match_parent"
-            android:iconifiedByDefault="false"
-            android:searchIcon="@drawable/ic_search"
-            android:layout_height="74dp">
-        </SearchView>
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_below="@id/searchview"
-            android:id="@+id/list_all_music"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
-    </RelativeLayout>
+        android:layout_height="74dp"
+        android:background="@color/colorOrange"
+        android:iconifiedByDefault="false"
+        android:queryHint="Nhập bài hát bạn muốn tìm kiếm"
+        android:searchIcon="@drawable/ic_search"
+        android:theme="@style/TextWhite" />
 
-
-</FrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_all_music"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchview" />
+</RelativeLayout>

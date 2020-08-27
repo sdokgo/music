@@ -75,7 +75,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 @Override
                 public void onClick(View v) {
                     getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.framesong, mediaPlaybackFragment)
+                            .replace(R.id.frame_song, mediaPlaybackFragment)
                             .addToBackStack("allsongsfragment").commit();
                 }
             });
@@ -87,7 +87,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         } else {
             update(mSongIndex);
             mRecyclerView.scrollToPosition(mSongIndex);
-            mAdapter.setiOnClickSongListener(mIOnClickSongListener);
+            mAdapter.setmIOnClickSongListener(mIOnClickSongListener);
         }
     }
 
@@ -115,8 +115,8 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     public void onStart() {
         super.onStart();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(mActivityMusic.BROADCAST_RECEIVER);
-        getActivity().registerReceiver(broadcastReceiver, intentFilter);
+        intentFilter.addAction(ActivityMusic.BROADCAST_RECEIVER);
+        getActivity().registerReceiver(mBroadcastReceiver, intentFilter);
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             if (mLockScreen) {
                 mSongIndex = new StorageUtil(getContext()).loadSongIndex();
@@ -130,7 +130,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        getActivity().unregisterReceiver(mBroadcastReceiver);
         mReplace = true;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mLockScreen = true;
@@ -141,10 +141,10 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     /**
      * Nhận BroadcastReceiver từ service
      */
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            int i = intent.getIntExtra(mActivityMusic.GET_SONG_INDEX, -1);
+            int i = intent.getIntExtra(ActivityMusic.GET_SONG_INDEX, -1);
             if (i != -1) {
                 update(i);
                 mSongIndex = i;
@@ -185,7 +185,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     public void setmIOnClickSongListener(IOnClickSongListener iOnClickSongListener) {
         this.mIOnClickSongListener = iOnClickSongListener;
         if (mAdapter != null) {
-            mAdapter.setiOnClickSongListener(iOnClickSongListener);
+            mAdapter.setmIOnClickSongListener(iOnClickSongListener);
         }
     }
 }

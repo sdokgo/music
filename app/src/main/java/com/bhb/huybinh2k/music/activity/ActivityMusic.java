@@ -32,7 +32,6 @@ import com.bhb.huybinh2k.music.PlaybackStatus;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
-import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 import com.bhb.huybinh2k.music.fragment.AllSongsFragment;
 import com.bhb.huybinh2k.music.fragment.FavoriteSongsFragment;
 import com.bhb.huybinh2k.music.fragment.MediaPlaybackFragment;
@@ -62,7 +61,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private StorageUtil storageUtil;
 
     private MediaPlaybackFragment mMediaPlaybackFragment;
-    private AllSongsFragment mAllSongsFragment;
 
     public int getmFavorite() {
         return mFavorite;
@@ -106,7 +104,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
         androidx.appcompat.widget.Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        mAllSongsFragment = new AllSongsFragment();
+        AllSongsFragment mAllSongsFragment = new AllSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -126,10 +124,10 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
             if (mFavorite == 1) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_song,
                         new FavoriteSongsFragment()).commit();
             } else {
-                getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_song,
                         mAllSongsFragment).commit();
             }
             mImagePause.setOnClickListener(new View.OnClickListener() {
@@ -143,14 +141,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
                 favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.framesong, favoriteSongsFragment)
-                        .replace(R.id.framesongplay, mMediaPlaybackFragment)
+                        .replace(R.id.frame_song, favoriteSongsFragment)
+                        .replace(R.id.frame_song_play, mMediaPlaybackFragment)
                         .commit();
             } else {
                 mAllSongsFragment.setmIOnClickSongListener(this);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.framesong, mAllSongsFragment)
-                        .replace(R.id.framesongplay, mMediaPlaybackFragment)
+                        .replace(R.id.frame_song, mAllSongsFragment)
+                        .replace(R.id.frame_song_play, mMediaPlaybackFragment)
                         .commit();
             }
 
@@ -172,7 +170,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         AllSongsFragment allSongsFragment = new AllSongsFragment();
                         allSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.framesong, allSongsFragment)
+                                .replace(R.id.frame_song, allSongsFragment)
                                 .commit();
                         mFavorite = 0;
                         storageUtil.storeIsFavorite(mFavorite);
@@ -181,7 +179,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
                         favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                         getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.framesong, favoriteSongsFragment)
+                                .replace(R.id.frame_song, favoriteSongsFragment)
                                 .commit();
                         mFavorite = 1;
                         storageUtil.storeIsFavorite(mFavorite);
@@ -212,8 +210,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             mMediaService = binder.getService();
             if (mFavorite == 0) {
                 mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
-            } else if (mFavorite == 1) {
-
             }
             if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mIUpdateMediaPlaybackFragment.update(mMediaService.getmSongIndexService());
@@ -313,7 +309,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     /**
      * Nhận BroadcastReceiver
      */
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int i = intent.getIntExtra(GET_SONG_INDEX, -1);
@@ -336,14 +332,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         Log.d("log", "onStartActivity");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BROADCAST_RECEIVER);
-        registerReceiver(broadcastReceiver, intentFilter);
+        registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.d("log", "onStopActivity");
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -403,7 +399,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             SearchFragment searchFragment = new SearchFragment();
             searchFragment.setmIOnClickSongListener(this);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.framesong, searchFragment)
+                    .replace(R.id.frame_song, searchFragment)
                     .addToBackStack(null)
                     .commit();
         }

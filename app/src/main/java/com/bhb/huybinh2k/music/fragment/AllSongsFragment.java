@@ -10,12 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.adapter.SongsAdapter;
-import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 
 import java.util.List;
 
@@ -45,7 +43,6 @@ public class AllSongsFragment extends BaseSongListFragment {
         if (i != -1 && listPlaying.size() == mList.size()) update(i);
         clickSong();
     }
-
 
     @Override
     public void onStart() {

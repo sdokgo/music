@@ -5,7 +5,6 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
     android:fitsSystemWindows="true"
     tools:context=".activity.ActivityMusic"
     tools:openDrawer="start">
@@ -20,8 +19,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorOrange">
 
-            <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
@@ -35,11 +33,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <FrameLayout
-                android:id="@+id/framesong"
+                android:id="@+id/frame_song"
                 android:layout_width="350dp"
                 android:layout_height="match_parent"/>
             <FrameLayout
-                android:id="@+id/framesongplay"
+                android:id="@+id/frame_song_play"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
         </LinearLayout>
@@ -55,7 +53,6 @@
             android:visibility="gone">
 
             <ImageView
-                android:contentDescription="song image"
                 android:id="@+id/img_playbar"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
@@ -63,23 +60,22 @@
                 android:src="@drawable/music" />
 
             <ImageView
-                android:contentDescription="button play pause"
                 android:id="@+id/playBar_Pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="5dp"
+                android:layout_marginEnd="5dp"
                 android:src="@drawable/ic_pause" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/dimen_10dp"
-                android:layout_marginRight="@dimen/dimen_20dp"
-                android:layout_toLeftOf="@id/playBar_Pause"
-                android:layout_toRightOf="@id/img_playbar">
+                android:layout_marginStart="@dimen/dimen_10dp"
+                android:layout_marginEnd="@dimen/dimen_20dp"
+                android:layout_toStartOf="@id/playBar_Pause"
+                android:layout_toEndOf="@id/img_playbar">
 
                 <TextView
                     android:id="@+id/tenbaihat_playbar"
