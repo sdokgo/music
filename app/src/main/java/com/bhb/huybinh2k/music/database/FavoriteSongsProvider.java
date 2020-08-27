@@ -73,12 +73,9 @@ public class FavoriteSongsProvider extends ContentProvider {
         }
         return list;
     }
-    public ArrayList<Song> search(String s)
+    public ArrayList<Song> searchSongByName(String s)
     {
         ArrayList<Song> list = new ArrayList<>();
-
-//        String sql ="SELECT * FROM "+ SongDatabaseHelper.ALL_SONGS_TABLE +" WHERE "
-//                +SongDatabaseHelper.SONG_NAME+" LIKE '?'";
         String[] args = {"%"+s+"%"};
         Cursor c = mDatabase.query(ALL_SONGS_TABLE, new String[]{
                 ID,ID_PROVIDER,SONG_NAME,SONG_PATH,SONG_ARTIST,IMAGE_PATH,DURATION,FAVORITE,COUNT_OF_PLAY

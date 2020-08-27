@@ -32,6 +32,7 @@ import com.bhb.huybinh2k.music.PlaybackStatus;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
+import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 import com.bhb.huybinh2k.music.fragment.AllSongsFragment;
 import com.bhb.huybinh2k.music.fragment.FavoriteSongsFragment;
 import com.bhb.huybinh2k.music.fragment.MediaPlaybackFragment;
@@ -52,7 +53,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private RelativeLayout mLayoutPlayBar;
     private ImageView mImagePause, mImageSong;
     private TextView mTextViewSong, mTextViewSinger;
-    private int mResumePosition = -1, mFavorite = 0;
+    private int mResumePosition = -1;
+    private int mFavorite = 0;
     private int mIsPlaying;
     private boolean mIsBack = false;
     private boolean mServiceBound = false;
@@ -61,6 +63,10 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
     private MediaPlaybackFragment mMediaPlaybackFragment;
     private AllSongsFragment mAllSongsFragment;
+
+    public int getmFavorite() {
+        return mFavorite;
+    }
 
     public MediaPlaybackService getmMediaService() {
         return mMediaService;
@@ -98,14 +104,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
-        androidx.appcompat.widget.Toolbar mToolbar;mToolbar = findViewById(R.id.toolbar);
+        androidx.appcompat.widget.Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mAllSongsFragment = new AllSongsFragment();
         mMediaPlaybackFragment = new MediaPlaybackFragment();
         final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_all);
-        mOrientation = getResources().getConfiguration().orientation;
+
 
         if (savedInstanceState != null) {
             mIsPlaying = savedInstanceState.getInt(IS_PLAYING);
@@ -116,8 +122,9 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
         mFavorite = storageUtil.loadIsFavorite();
 
-
+        mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+
             if (mFavorite == 1) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.framesong,
                         new FavoriteSongsFragment()).commit();
@@ -194,6 +201,9 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             mServiceBound = true;
         }
     }
+
+
+
 
     public ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override

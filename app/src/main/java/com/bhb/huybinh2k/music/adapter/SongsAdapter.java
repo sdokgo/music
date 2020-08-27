@@ -22,11 +22,10 @@ import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHolder> {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> {
     private Context mContext;
     private boolean isFavorite;
     private List<Song> mList;
-    private int mPlayingPosition = -1;
 
     public void setmPlayingIdProvider(int mPlayingIdProvider) {
         this.mPlayingIdProvider = mPlayingIdProvider;
@@ -60,10 +59,6 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-//        holder.stt.setVisibility(position == mPlayingPosition ? View.INVISIBLE : View.VISIBLE);
-//        holder.sn.setTypeface(position == mPlayingPosition ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-//        holder.imgstt.setVisibility(position == mPlayingPosition ? View.VISIBLE : View.INVISIBLE);
-
         final Song song = mList.get(position);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +69,6 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
                         iOnClickSongListener.update(song.getId() - 1);
                     }
                 }
-
             }
         });
 
@@ -158,14 +152,10 @@ public class AllSongsAdapter extends RecyclerView.Adapter<AllSongsAdapter.ViewHo
         }
     }
 
-    public AllSongsAdapter(@NonNull Context context, @NonNull List<Song> objects, boolean isFavorite) {
+    public SongsAdapter(@NonNull Context context, @NonNull List<Song> objects, boolean isFavorite) {
         this.mContext = context;
         this.mList = objects;
         this.isFavorite = isFavorite;
     }
 
-
-    public void setPlayingPosition(int mPlayingPosition) {
-        this.mPlayingPosition = mPlayingPosition;
-    }
 }

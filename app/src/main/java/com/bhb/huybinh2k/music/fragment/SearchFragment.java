@@ -1,22 +1,23 @@
 package com.bhb.huybinh2k.music.fragment;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
+
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
-import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
+import com.bhb.huybinh2k.music.adapter.SongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
-import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
 import java.util.List;
 
@@ -37,12 +38,11 @@ public class SearchFragment extends BaseSongListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         listSerach = favoriteSongsProvider.listAllSongs();
 
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mList.clear();
-                List<Song> list = new FavoriteSongsProvider(getContext()).search(s);
+                List<Song> list = new FavoriteSongsProvider(getContext()).searchSongByName(s);
                 for (Song song : list) {
                     mList.add(song);
                 }
@@ -59,11 +59,11 @@ public class SearchFragment extends BaseSongListFragment {
                 return false;
             }
         });
-        mAdapter = new AllSongsAdapter(getContext(), mList, false);
+        mAdapter = new SongsAdapter(getContext(), mList, false);
         super.onViewCreated(view, savedInstanceState);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-        mAdapter.setOnItemClickListener(new AllSongsAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 int index = mList.get(position).getId() - 1;
@@ -76,21 +76,31 @@ public class SearchFragment extends BaseSongListFragment {
                 }
                 mActivityMusic.playAudio(index, listSerach);
                 mActivityMusic.setmIsPlaying(0);
-//                getFragmentManager().popBackStack();
-                updateUI(index);
+                getFragmentManager().popBackStack();
+                if (mActivityMusic.getmFavorite() == 1) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.framesong, new AllSongsFragment())
+                            .commit();
+                }
+//                updateUI(index);
             }
         });
     }
 
-    public void updateUI(int songIndex) {
-        mAdapter.setmPlayingIdProvider(listSerach.get(songIndex).getIdProvider());
-        mAdapter.notifyDataSetChanged();
-        mRecyclerView.scrollToPosition(songIndex);
-        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mSongIndex != -1) {
-                mPlayBar.setVisibility(View.VISIBLE);
-                mActivityMusic.updateUIPlayBar(songIndex);
-            }
-        }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
+
+    //    public void updateUI(int songIndex) {
+//        mAdapter.setmPlayingIdProvider(listSerach.get(songIndex).getIdProvider());
+//        mAdapter.notifyDataSetChanged();
+//        mRecyclerView.scrollToPosition(songIndex);
+//        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+//            if (mSongIndex != -1) {
+//                mPlayBar.setVisibility(View.VISIBLE);
+//                mActivityMusic.updateUIPlayBar(songIndex);
+//            }
+//        }
+//    }
 }

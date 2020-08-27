@@ -38,7 +38,6 @@ import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
-import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -149,7 +148,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         });
 
         if (!mActivityMusic.isServiceBound()) {
-            getSongList();
+            mListPlaying = mFavoriteSongsProvider.listAllSongs();
             if (mListPlaying.size() > 0) {
                 mActivityMusic.playAudio(0, mListPlaying);
             } else {
@@ -161,7 +160,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             updateUI(mSongIndex);
         }
 
-        updateImgaeLikeDislike();
+        updateImageLikeDislike();
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -174,7 +173,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             });
         }
 
-
         mImageDislike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -182,13 +180,13 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                     case 0:
                     case 2:
                         mListPlaying.get(mSongIndex).setIsFavorite(1);
-                        new FavoriteSongsProvider(getContext()).update(mListPlaying.get(mSongIndex));
+                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
                         mImageDislike.setImageResource(R.drawable.ic_thumbs_down_selected);
                         mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
                         break;
                     case 1:
                         mListPlaying.get(mSongIndex).setIsFavorite(0);
-                        new FavoriteSongsProvider(getContext()).update(mListPlaying.get(mSongIndex));
+                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
                         mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
                         break;
                 }
@@ -202,13 +200,13 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                     case 0:
                     case 1:
                         mListPlaying.get(mSongIndex).setIsFavorite(2);
-                        new FavoriteSongsProvider(getContext()).update(mListPlaying.get(mSongIndex));
+                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
                         mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
                         mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
                         break;
                     case 2:
                         mListPlaying.get(mSongIndex).setIsFavorite(0);
-                        new FavoriteSongsProvider(getContext()).update(mListPlaying.get(mSongIndex));
+                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
                         mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
                         break;
                 }
@@ -225,7 +223,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.addToFavorite) {
                     mListPlaying.get(mSongIndex).setIsFavorite(2);
-                    new FavoriteSongsProvider(getContext()).update(mListPlaying.get(mSongIndex));
+                    mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
                     Toast.makeText(getContext(), "Add Succes", Toast.LENGTH_SHORT).show();
                 }
 
@@ -236,9 +234,10 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     }
 
 
-    private void updateImgaeLikeDislike(){
-        Song checkSong = mFavoriteSongsProvider.getSongByIdProvider(mListPlaying.get(mSongIndex).getIdProvider());
-        switch (checkSong.getIsFavorite()) {
+
+    private void updateImageLikeDislike(){
+        Song song = mFavoriteSongsProvider.getSongByIdProvider(mListPlaying.get(mSongIndex).getIdProvider());
+        switch (song.getIsFavorite()) {
             case 2:
                 mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
                 mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
@@ -361,15 +360,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         }
     }
 
-    //    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        Bundle bundle = getArguments();
-//        if (bundle!= null){
-//            mSongIndex = bundle.getInt(AllSongsFragment.SONG_INDEX);
-//            updateUI(mSongIndex);
-//        }
-//    }
     public void update(Bundle bundle) {
         if (bundle != null) {
             mSongIndex = bundle.getInt(AllSongsFragment.SONG_INDEX);
@@ -395,7 +385,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             mRunTime.setText(mDateFormat.format(mActivityMusic.getmResumePosition()));
             mSeekBar.setProgress(mActivityMusic.getmResumePosition());
         }
-        updateImgaeLikeDislike();
+        updateImageLikeDislike();
         updateTime();
     }
 
@@ -526,45 +516,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mStorageUtil.storeShuffle(mShuffle);
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mActivityMusic.setmIsBack(true);
-        }
-        new StorageUtil(getContext()).storeSongListPlaying(mListPlaying);
-    }
-
-
-    public void getSongList() {
-        mListPlaying.clear();
-        ContentResolver musicResolver = getActivity().getContentResolver();
-        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
-        if (musicCursor != null) {
-            if (musicCursor.moveToFirst()) {
-                int id = 1;
-                do {
-                    String thisTitle = musicCursor.getString(
-                            musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    String thisArtist = musicCursor.getString(
-                            musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String songpath = musicCursor.getString(
-                            musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-                    int idProvider = musicCursor.getInt(
-                            musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-
-                    Long albumId = musicCursor.getLong(musicCursor
-                            .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
-                    Uri sArtworkUri = Uri
-                            .parse("content://media/external/audio/albumart");
-                    Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
-                    String albumArt = String.valueOf(albumArtUri);
-
-                    Long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-
-                    mListPlaying.add(new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds));
-                    id++;
-
-                }
-                while (musicCursor.moveToNext());
-            }
         }
     }
 

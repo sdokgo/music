@@ -24,9 +24,8 @@ import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
-import com.bhb.huybinh2k.music.adapter.AllSongsAdapter;
+import com.bhb.huybinh2k.music.adapter.SongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
-import com.bhb.huybinh2k.music.database.SongDatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     protected int mOrientation, mSongIndex;
     protected boolean mLockScreen = false, mReplace = false;
     protected MediaPlaybackFragment mediaPlaybackFragment;
-    protected AllSongsAdapter mAdapter;
+    protected SongsAdapter mAdapter;
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
     protected FavoriteSongsProvider favoriteSongsProvider;
 
@@ -95,7 +94,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
 
 
     public void clickSong(){
-        mAdapter.setOnItemClickListener(new AllSongsAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
                 mSongIndex = position;
@@ -168,7 +167,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         if (songIndex!= -1){
             List<Song> s = new StorageUtil(getContext()).loadSongListPlaying();
             if (s.size() == mList.size()) {
-//            mAdapter.setPlayingPosition(songIndex);
                 mAdapter.setmPlayingIdProvider(mList.get(songIndex).getIdProvider());
                 mAdapter.notifyDataSetChanged();
                 mRecyclerView.scrollToPosition(songIndex);
