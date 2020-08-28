@@ -20,6 +20,7 @@ import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 public class SplashScreen extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 113;
+    private static final String ALBUM_ART ="content://media/external/audio/albumart" ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class SplashScreen extends AppCompatActivity {
         checkPermision();
     }
 
-    Runnable wait1s = new Runnable() {
+    Runnable mWait1s = new Runnable() {
         @Override
         public void run() {
             try {
@@ -56,7 +57,7 @@ public class SplashScreen extends AppCompatActivity {
                         android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
             } else {
                 getSongList();
-                Thread thread = new Thread(wait1s);
+                Thread thread = new Thread(mWait1s);
                 thread.start();
             }
         }
@@ -87,7 +88,7 @@ public class SplashScreen extends AppCompatActivity {
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
 
                     Uri sArtworkUri = Uri
-                            .parse("content://media/external/audio/albumart");
+                            .parse(ALBUM_ART);
                     Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
                     String albumArt = String.valueOf(albumArtUri);
 

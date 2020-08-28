@@ -23,20 +23,20 @@ public class StorageUtil {
         this.mContext = context;
     }
 
-    public void storeIsFavorite(int i){
+    public void storeIsFavorite(boolean i){
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt(IS_FAVORITE,i);
+        editor.putBoolean(IS_FAVORITE,i);
         editor.apply();
     }
-    public int loadIsFavorite(){
+    public boolean loadIsFavorite(){
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        return mPreferences.getInt(IS_FAVORITE,-1);
+        return mPreferences.getBoolean(IS_FAVORITE,false);
     }
 
 
 
-    public void storeSongListPlaying(List<Song> list) {
+    public void storeListSongPlaying(List<Song> list) {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
         Gson gson = new Gson();
@@ -45,7 +45,7 @@ public class StorageUtil {
         editor.apply();
     }
 
-    public List<Song> loadSongListPlaying() {
+    public List<Song> loadListSongPlaying() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPreferences.getString(LIST_SONG_PLAYING, null);
@@ -92,10 +92,10 @@ public class StorageUtil {
         return mPreferences.getInt(REPEAT, -1);
     }
 
-//    public void clearSongIndex() {
+//    public void clearListSongPlaying() {
 //        mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = mPreferences.edit();
-//        editor.remove(SONG_INDEX);
+//        editor.remove(LIST_SONG_PLAYING);
 //        editor.commit();
 //    }
 }

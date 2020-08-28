@@ -50,11 +50,13 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private static final String FAVORITE = "com.bhb.huybinh2k.FAVORITE";
     private MediaPlaybackService mMediaService;
     private RelativeLayout mLayoutPlayBar;
-    private ImageView mImagePause, mImageSong;
-    private TextView mTextViewSong, mTextViewSinger;
+    private ImageView mImagePause,
+            mImageSong;
+    private TextView mTextViewSong,
+            mTextViewSinger;
     private int mResumePosition = -1;
-    private int mFavorite = 0;
-    private int mIsPlaying;
+    private boolean mFavorite = false;
+    private boolean mIsPlaying;
     private boolean mIsBack = false;
     private boolean mServiceBound = false;
     private int mOrientation;
@@ -62,7 +64,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
     private MediaPlaybackFragment mMediaPlaybackFragment;
 
-    public int getmFavorite() {
+    public boolean getmFavorite() {
         return mFavorite;
     }
 
@@ -70,11 +72,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         return mMediaService;
     }
 
-    public int getmIsPlaying() {
+    public boolean getmIsPlaying() {
         return mIsPlaying;
     }
 
-    public void setmIsPlaying(int mIsPlaying) {
+    public void setmIsPlaying(boolean mIsPlaying) {
         this.mIsPlaying = mIsPlaying;
     }
 
@@ -112,18 +114,18 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
 
         if (savedInstanceState != null) {
-            mIsPlaying = savedInstanceState.getInt(IS_PLAYING);
+            mIsPlaying = savedInstanceState.getBoolean(IS_PLAYING);
             mResumePosition = savedInstanceState.getInt(RESUME_POSITION);
             updateImagePlayPause();
             mServiceBound = savedInstanceState.getBoolean(SERVICE_BOUND);
-            mFavorite = savedInstanceState.getInt(FAVORITE);
+            mFavorite = savedInstanceState.getBoolean(FAVORITE);
         }
         mFavorite = storageUtil.loadIsFavorite();
 
         mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            if (mFavorite == 1) {
+            if (mFavorite) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_song,
                         new FavoriteSongsFragment()).commit();
             } else {
@@ -137,7 +139,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 }
             });
         } else {
-            if (mFavorite == 1) {
+            if (mFavorite) {
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
                 favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                 getSupportFragmentManager().beginTransaction()
@@ -156,7 +158,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
-        if (mFavorite == 1) {
+        if (mFavorite) {
             x = R.id.nav_favorite;
         } else {
             x = R.id.nav_all;
@@ -172,7 +174,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.frame_song, allSongsFragment)
                                 .commit();
-                        mFavorite = 0;
+                        mFavorite = false;
                         storageUtil.storeIsFavorite(mFavorite);
                         break;
                     case R.id.nav_favorite:
@@ -181,7 +183,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.frame_song, favoriteSongsFragment)
                                 .commit();
-                        mFavorite = 1;
+                        mFavorite = true;
                         storageUtil.storeIsFavorite(mFavorite);
                         break;
                 }
@@ -201,25 +203,23 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     }
 
 
-
-
-    public ServiceConnection mServiceConnection = new ServiceConnection() {
+    public final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
             mMediaService = binder.getService();
-            if (mFavorite == 0) {
+            if (!mFavorite) {
                 mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
             }
             if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mIUpdateMediaPlaybackFragment.update(mMediaService.getmSongIndexService());
             }
-            if (mMediaService.getIsPlaying() == -1) {
+            if (!mMediaService.getmIsPlaying()) {
                 mImagePause.setImageResource(R.drawable.ic_play);
-                mIsPlaying = 1;
+                mIsPlaying = false;
             } else {
                 mImagePause.setImageResource(R.drawable.ic_pause);
-                mIsPlaying = 0;
+                mIsPlaying = true;
             }
             mServiceBound = true;
         }
@@ -236,7 +236,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      */
     public void playAudio(int songIndex, List<Song> list) {
         StorageUtil storage = new StorageUtil(this);
-        storage.storeSongListPlaying(list);
+        storage.storeListSongPlaying(list);
         storage.storeSongIndex(songIndex);
         if (!mServiceBound) {
 
@@ -253,12 +253,12 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật image play/pause khi nhận đc receiver
      */
     private void playPauseReceiver() {
-        if (mIsPlaying == 0) {
+        if (mIsPlaying) {
             mImagePause.setImageResource(R.drawable.ic_play);
-            mIsPlaying = 1;
-        } else if (mIsPlaying == 1) {
+            mIsPlaying = false;
+        } else {
             mImagePause.setImageResource(R.drawable.ic_pause);
-            mIsPlaying = 0;
+            mIsPlaying = true;
         }
     }
 
@@ -266,7 +266,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật image play/pause
      */
     public void updateImagePlayPause() {
-        if (mIsPlaying == 1) {
+        if (!mIsPlaying) {
             mImagePause.setImageResource(R.drawable.ic_play);
         } else {
             mImagePause.setImageResource(R.drawable.ic_pause);
@@ -277,7 +277,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật lại giao diên playbar
      */
     public void updateUIPlayBar(int i) {
-        List<Song> mList = new StorageUtil(this).loadSongListPlaying();
+        List<Song> mList = new StorageUtil(this).loadListSongPlaying();
         Song s = mList.get(i);
         if (mLayoutPlayBar.getVisibility() == View.VISIBLE) {
             updateImagePlayPause();
@@ -291,17 +291,17 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * Sự kiện khi click nào play/pause
      */
     private void clickPlayPause() {
-        if (mIsPlaying == 0) {
+        if (mIsPlaying) {
             mMediaService.pauseMedia();
             mImagePause.setImageResource(R.drawable.ic_play);
             mMediaService.buildNotification(PlaybackStatus.PAUSE);
             mResumePosition = mMediaService.getmMediaPlayer().getCurrentPosition();
-            mIsPlaying = 1;
-        } else if (mIsPlaying == 1) {
+            mIsPlaying = false;
+        } else {
             mMediaService.resumeMedia();
             mImagePause.setImageResource(R.drawable.ic_pause);
             mMediaService.buildNotification(PlaybackStatus.PLAYING);
-            mIsPlaying = 0;
+            mIsPlaying = true;
         }
     }
 
@@ -309,17 +309,21 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     /**
      * Nhận BroadcastReceiver
      */
-    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int i = intent.getIntExtra(GET_SONG_INDEX, -1);
             int x = intent.getIntExtra(PLAY_PAUSE, -1);
             if (x != -1) {
-                mIsPlaying = x;
+                if (x == 1) {
+                    mIsPlaying = false;
+                } else {
+                    mIsPlaying = true;
+                }
                 playPauseReceiver();
             }
             if (i != -1) {
-                mIsPlaying = 0;
+                mIsPlaying = true;
                 updateUIPlayBar(i);
             }
         }
@@ -347,11 +351,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         super.onDestroy();
         Log.d("log", "onDestroyActivity");
         if (isFinishing()) {
-            if (mIsPlaying == 1) {
+            if (!mIsPlaying) {
                 unbindService(mServiceConnection);
                 mMediaService.stopSelf();
                 storageUtil.storeSongIndex(-1);
-                storageUtil.storeIsFavorite(0);
+                storageUtil.storeIsFavorite(false);
             }
         }
 
@@ -364,11 +368,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         super.onBackPressed();
         if (!mIsBack) {
             if (mServiceBound) {
-                if (mIsPlaying == 1) {
+                if (!mIsPlaying) {
                     unbindService(mServiceConnection);
                     mMediaService.stopSelf();
                     storageUtil.storeSongIndex(-1);
-                    storageUtil.storeIsFavorite(0);
+                    storageUtil.storeIsFavorite(false);
                 }
             }
         }
@@ -379,8 +383,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SERVICE_BOUND, mServiceBound);
-        outState.putInt(IS_PLAYING, mIsPlaying);
-        outState.putInt(FAVORITE, mFavorite);
+        outState.putBoolean(IS_PLAYING, mIsPlaying);
+        outState.putBoolean(FAVORITE, mFavorite);
         if (mServiceBound) {
             outState.putInt(RESUME_POSITION, mMediaService.getmMediaPlayer().getCurrentPosition());
         }

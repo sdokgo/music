@@ -9,4 +9,16 @@
     <string name="music">Music</string>
     <string name="binhbh_bkav_com">BinhBH@bkav.com</string>
     <string name="remove_from_favorite">Remove from Favorite</string>
+    <string name="no_search_results">Không tìm thấy bài hát cần tìm</string>
+    <string name="remove_succes">Remove Succes</string>
+    <string name="add_succes">Add Succes</string>
+    <string name="no_music">No music</string>
+    <string name="add_song_to_favorite">Hãy thêm bài hát yêu thích</string>
+    <string name="previous">previous</string>
+    <string name="pause">pause</string>
+    <string name="next">next</string>
+    <string name="music_notification">Music Notification</string>
+    <string name="enter_the_song_want_to_find">Nhập bài hát bạn muốn tìm kiếm</string>
+    <string name="allsongsfragment">allsongsfragment</string>
+    <string name="MediaSession">MediaSession</string>
 </resources>

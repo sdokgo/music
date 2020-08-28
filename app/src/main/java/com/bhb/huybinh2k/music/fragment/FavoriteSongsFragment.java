@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.adapter.SongsAdapter;
@@ -28,15 +29,17 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mList = favoriteSongsProvider.listFavorite();
         if (mList.size() == 0)
-            Toast.makeText(getContext(), "Hãy thêm bài hát yêu thích", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.add_song_to_favorite, Toast.LENGTH_SHORT).show();
         mAdapter = new SongsAdapter(getContext(), mList, true);
 
         super.onViewCreated(view, savedInstanceState);
 
         int i = new StorageUtil(getContext()).loadSongIndex();
-        List<Song> listPlaying = new StorageUtil(getContext()).loadSongListPlaying();
-        if (mActivityMusic.getmFavorite() == 1 && listPlaying.size() != favoriteSongsProvider.listFavorite().size()) {
-            mList = favoriteSongsProvider.listFavorite();
+        List<Song> listPlaying = new StorageUtil(getContext()).loadListSongPlaying();
+        if (listPlaying != null) {
+            if (mActivityMusic.getmFavorite() && listPlaying.size() != favoriteSongsProvider.listFavorite().size()) {
+                mList = favoriteSongsProvider.listFavorite();
+            }
         }
         if (i != -1) update(i);
         clickSong();

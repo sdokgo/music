@@ -162,11 +162,11 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             if (mListPlaying.size() > 0) {
                 mActivityMusic.playAudio(0, mListPlaying);
             } else {
-                Toast.makeText(getContext(), "No music found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.no_music, Toast.LENGTH_SHORT).show();
             }
         }
         if (mSongIndex != -1) {
-            mListPlaying = mStorageUtil.loadSongListPlaying();
+            mListPlaying = mStorageUtil.loadListSongPlaying();
             updateUI(mSongIndex);
         }
 
@@ -234,7 +234,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 if (item.getItemId() == R.id.addToFavorite) {
                     mListPlaying.get(mSongIndex).setIsFavorite(2);
                     mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
-                    Toast.makeText(getContext(), "Add Succes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.add_succes, Toast.LENGTH_SHORT).show();
                 }
 
                 return false;
@@ -298,12 +298,11 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         if (mShuffle == 0) {
             mShuffle = 1;
             mImageShuffle.setImageResource(R.drawable.ic_shuffle_black);
-            mActivityMusic.getmMediaService().updateShuffleRepeat(mShuffle, mRepeat);
         } else {
             mShuffle = 0;
             mImageShuffle.setImageResource(R.drawable.ic_shuffle_white);
-            mActivityMusic.getmMediaService().updateShuffleRepeat(mShuffle, mRepeat);
         }
+        mActivityMusic.getmMediaService().updateShuffleRepeat(mShuffle, mRepeat);
     }
 
     /**
@@ -331,17 +330,17 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
      * sự kiện khi click image play/pause
      */
     private void clickPlayPause() {
-        if (mActivityMusic.getmIsPlaying() == 0) {
+        if (mActivityMusic.getmIsPlaying()) {
             mActivityMusic.getmMediaService().pauseMedia();
             mImagePause.setImageResource(R.drawable.ic_play_circle);
             mActivityMusic.getmMediaService().buildNotification(PlaybackStatus.PAUSE);
-            mActivityMusic.setmIsPlaying(1);
-        } else if (mActivityMusic.getmIsPlaying() == 1) {
+            mActivityMusic.setmIsPlaying(false);
+        } else {
             mImagePause.setImageResource(R.drawable.ic_pause_circle);
             mActivityMusic.getmMediaService().resumeMedia();
             mActivityMusic.getmMediaService().buildNotification(PlaybackStatus.PLAYING);
             updateTime();
-            mActivityMusic.setmIsPlaying(0);
+            mActivityMusic.setmIsPlaying(true);
         }
     }
 
@@ -350,12 +349,12 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
      * cập nhật image play/pause khi nhận được receiver
      */
     private void playPauseReceiver() {
-        if (mActivityMusic.getmIsPlaying() == 0) {
+        if (mActivityMusic.getmIsPlaying()) {
             mImagePause.setImageResource(R.drawable.ic_play_circle);
-            mActivityMusic.setmIsPlaying(1);
-        } else if (mActivityMusic.getmIsPlaying() == 1) {
+            mActivityMusic.setmIsPlaying(false);
+        } else if (!mActivityMusic.getmIsPlaying()) {
             mImagePause.setImageResource(R.drawable.ic_pause_circle);
-            mActivityMusic.setmIsPlaying(0);
+            mActivityMusic.setmIsPlaying(true);
         }
     }
 
@@ -363,7 +362,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
      * cập nhật image play/pause
      */
     private void updateImagePlayPause() {
-        if (mActivityMusic.getmIsPlaying() == 1) {
+        if (!mActivityMusic.getmIsPlaying()) {
             mImagePause.setImageResource(R.drawable.ic_play_circle);
         } else {
             mImagePause.setImageResource(R.drawable.ic_pause_circle);
@@ -383,7 +382,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     public void updateUI(int index) {
         mLayoutPlayBar.setVisibility(View.GONE);
         updateImagePlayPause();
-        mListPlaying = mStorageUtil.loadSongListPlaying();
+        mListPlaying = mStorageUtil.loadListSongPlaying();
         Song song = mListPlaying.get(index);
         mImageSong.setImageURI(Uri.parse(song.getImg()));
         mImageIcon.setImageURI(Uri.parse(song.getImg()));
@@ -430,7 +429,11 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 updateUI(mSongIndex);
             }
             if (x != -1) {
-                mActivityMusic.setmIsPlaying(x);
+                if (x==1){
+                    mActivityMusic.setmIsPlaying(false);
+                }else {
+                    mActivityMusic.setmIsPlaying(true);
+                }
                 playPauseReceiver();
             }
         }
@@ -443,7 +446,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     private void skipToNext() {
         mActivityMusic.getmMediaService().skipToNext();
         updateUI(mActivityMusic.getmMediaService().getmSongIndexService());
-        mActivityMusic.setmIsPlaying(0);
+        mActivityMusic.setmIsPlaying(true);
         mSeekBar.setProgress(0);
         mActivityMusic.getmMediaService().buildNotification(PlaybackStatus.PLAYING);
         sendBroadcast();
@@ -457,7 +460,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         if (mActivityMusic.getmMediaService().getmMediaPlayer().getCurrentPosition() < 3000) {
             mActivityMusic.getmMediaService().skipToPrevious();
             updateUI(mActivityMusic.getmMediaService().getmSongIndexService());
-            mActivityMusic.setmIsPlaying(0);
+            mActivityMusic.setmIsPlaying(true);
 
             mActivityMusic.getmMediaService().buildNotification(PlaybackStatus.PLAYING);
 

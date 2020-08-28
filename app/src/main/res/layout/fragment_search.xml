@@ -11,7 +11,7 @@
         android:layout_height="74dp"
         android:background="@color/colorOrange"
         android:iconifiedByDefault="false"
-        android:queryHint="Nhập bài hát bạn muốn tìm kiếm"
+        android:queryHint="@string/enter_the_song_want_to_find"
         android:searchIcon="@drawable/ic_search"
         android:theme="@style/TextWhite" />
 

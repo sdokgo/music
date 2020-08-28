@@ -36,10 +36,13 @@ public class AllSongsFragment extends BaseSongListFragment {
         super.onViewCreated(view, savedInstanceState);
 
         int i = new StorageUtil(getContext()).loadSongIndex();
-        List<Song> listPlaying = new StorageUtil(getContext()).loadSongListPlaying();
-        if (mActivityMusic.getmFavorite()!=1 && listPlaying.size()!= favoriteSongsProvider.listAllSongs().size()){
-            mList = favoriteSongsProvider.listAllSongs();
+        List<Song> listPlaying = new StorageUtil(getContext()).loadListSongPlaying();
+        if (listPlaying != null) {
+            if (!mActivityMusic.getmFavorite() && listPlaying.size() != favoriteSongsProvider.listAllSongs().size()) {
+                mList = favoriteSongsProvider.listAllSongs();
+            }
         }
+
         if (i != -1 && listPlaying.size() == mList.size()) update(i);
         clickSong();
     }

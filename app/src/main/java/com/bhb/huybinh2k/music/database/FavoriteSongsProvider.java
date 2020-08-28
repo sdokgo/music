@@ -14,15 +14,11 @@ import com.bhb.huybinh2k.music.Song;
 import java.util.ArrayList;
 
 public class FavoriteSongsProvider extends ContentProvider {
-    private SQLiteDatabase mDatabase;
-
+    private final SQLiteDatabase mDatabase;
     public FavoriteSongsProvider(Context context) {
-        Context mContext = context;
-        SongDatabaseHelper helper = new SongDatabaseHelper(mContext);
+        SongDatabaseHelper helper = new SongDatabaseHelper(context);
         this.mDatabase = helper.getWritableDatabase();
     }
-
-
     public static final String ALL_SONGS_TABLE = SongDatabaseHelper.ALL_SONGS_TABLE;
     public static final String ID = SongDatabaseHelper.ID;
     public static final String ID_PROVIDER = SongDatabaseHelper.ID_PROVIDER;
@@ -149,7 +145,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         values.put(COUNT_OF_PLAY,song.getCountOfPlay());
         values.put(FAVORITE,song.getIsFavorite());
         String whereClause = ID_PROVIDER+"=?";
-        String whereArgs[] = {String.valueOf(song.getIdProvider())};
+        String[] whereArgs = {String.valueOf(song.getIdProvider())};
         mDatabase.update(ALL_SONGS_TABLE,values,whereClause,whereArgs);
     }
 

@@ -35,8 +35,10 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     protected RecyclerView mRecyclerView;
     protected ActivityMusic mActivityMusic;
     protected RelativeLayout mPlayBar;
-    protected int mOrientation, mSongIndex;
-    protected boolean mLockScreen = false, mReplace = false;
+    protected int mOrientation;
+    protected int mSongIndex;
+    protected boolean mLockScreen = false;
+    protected boolean mReplace = false;
     protected MediaPlaybackFragment mediaPlaybackFragment;
     protected SongsAdapter mAdapter;
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
@@ -76,13 +78,13 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 public void onClick(View v) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.frame_song, mediaPlaybackFragment)
-                            .addToBackStack("allsongsfragment").commit();
+                            .addToBackStack(getString(R.string.allsongsfragment)).commit();
                 }
             });
             if (mReplace) {
                 if (mSongIndex != -1) update(mSongIndex);
                 mReplace = false;
-                mList = new StorageUtil(getContext()).loadSongListPlaying();
+                mList = new StorageUtil(getContext()).loadListSongPlaying();
             }
         } else {
             update(mSongIndex);
@@ -92,8 +94,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     }
 
 
-
-    public void clickSong(){
+    public void clickSong() {
         mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
@@ -105,7 +106,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                     favoriteSongsProvider.update(mList.get(position));
                 }
                 mActivityMusic.playAudio(position, mList);
-                mActivityMusic.setmIsPlaying(0);
+                mActivityMusic.setmIsPlaying(true);
                 update(position);
             }
         });
@@ -141,7 +142,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     /**
      * Nhận BroadcastReceiver từ service
      */
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int i = intent.getIntExtra(ActivityMusic.GET_SONG_INDEX, -1);
@@ -164,8 +165,8 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
      */
     @Override
     public void update(int songIndex) {
-        if (songIndex!= -1){
-            List<Song> s = new StorageUtil(getContext()).loadSongListPlaying();
+        if (songIndex != -1) {
+            List<Song> s = new StorageUtil(getContext()).loadListSongPlaying();
             if (s.size() == mList.size()) {
                 mAdapter.setmPlayingIdProvider(mList.get(songIndex).getIdProvider());
                 mAdapter.notifyDataSetChanged();
@@ -174,7 +175,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         }
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (mSongIndex != -1){
+            if (mSongIndex != -1) {
                 mPlayBar.setVisibility(View.VISIBLE);
                 mActivityMusic.updateUIPlayBar(songIndex);
             }
@@ -182,6 +183,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     }
 
     private IOnClickSongListener mIOnClickSongListener;
+
     public void setmIOnClickSongListener(IOnClickSongListener iOnClickSongListener) {
         this.mIOnClickSongListener = iOnClickSongListener;
         if (mAdapter != null) {

@@ -109,7 +109,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                         new FavoriteSongsProvider(mContext).update(song);
                         mList.remove(song);
                         notifyDataSetChanged();
-                        Toast.makeText(mContext, "Remove Succes", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.remove_succes, Toast.LENGTH_SHORT).show();
                     }
                     return false;
                 }
@@ -122,7 +122,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                     if (item.getItemId() == R.id.addToFavorite) {
                         song.setIsFavorite(2);
                         new FavoriteSongsProvider(mContext).update(song);
-                        Toast.makeText(mContext, "Add Succes", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.add_succes, Toast.LENGTH_SHORT).show();
                     }
                     return false;
                 }

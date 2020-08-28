@@ -179,10 +179,13 @@
     </RelativeLayout>
 
     <SeekBar
+        android:progressTint="@color/colorOrange"
+        android:progressBackgroundTint="#000000"
         android:id="@+id/seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/control_song" />
+        android:layout_above="@id/control_song"
+        android:thumbTint="@color/colorOrange" />
 
 
 

@@ -14,7 +14,7 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appbarlayout"
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorOrange">
@@ -22,12 +22,12 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
+                android:layout_height="@dimen/dimen_64dp"
                 app:titleTextAppearance="@style/Medium"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <LinearLayout
-            android:layout_below="@id/appbarlayout"
+            android:layout_below="@id/app_bar_layout"
             android:layout_above="@id/layoutPlayBar"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -47,15 +47,15 @@
         <RelativeLayout
             android:id="@+id/layoutPlayBar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="@dimen/dimen_64dp"
             android:layout_alignParentBottom="true"
             android:layout_margin="@dimen/dimen_10dp"
             android:visibility="gone">
 
             <ImageView
                 android:id="@+id/img_playbar"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="@dimen/dimen_64dp"
+                android:layout_height="@dimen/dimen_64dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/music" />
 
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="@dimen/dimen_5dp"
                 android:src="@drawable/ic_pause" />
 
             <RelativeLayout

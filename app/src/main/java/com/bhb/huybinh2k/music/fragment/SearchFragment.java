@@ -41,12 +41,9 @@ public class SearchFragment extends BaseSongListFragment {
             public boolean onQueryTextSubmit(String s) {
                 mList.clear();
                 List<Song> list = new FavoriteSongsProvider(getContext()).searchSongByName(s);
-                for (Song song : list) {
-                    mList.add(song);
-                }
-//                mList = new FavoriteSongsProvider(getContext()).search(s);
+                mList.addAll(list);
                 if (mList.size() == 0) {
-                    Toast.makeText(getContext(), "Không tìm thấy bài hát cần tìm", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.no_search_results, Toast.LENGTH_SHORT).show();
                 }
                 mAdapter.notifyDataSetChanged();
                 return false;
@@ -73,9 +70,9 @@ public class SearchFragment extends BaseSongListFragment {
                     favoriteSongsProvider.update(mList.get(position));
                 }
                 mActivityMusic.playAudio(index, listSerach);
-                mActivityMusic.setmIsPlaying(0);
+                mActivityMusic.setmIsPlaying(true);
                 getFragmentManager().popBackStack();
-                if (mActivityMusic.getmFavorite() == 1) {
+                if (mActivityMusic.getmFavorite()) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.frame_song, new AllSongsFragment())
                             .commit();
