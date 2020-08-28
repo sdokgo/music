@@ -102,6 +102,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         updateImageRepeatShuffle();
         mActivityMusic = (ActivityMusic) getActivity();
         mActivityMusic.setmIUpdateMediaPlaybackFragment(this);
+
         mImageShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,24 +113,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             @Override
             public void onClick(View view) {
                 clickRepeat();
-            }
-        });
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                mActivityMusic.getmMediaService().seekTo(seekBar.getProgress());
-                mRunTime.setText(mDateFormat.format(
-                        mActivityMusic.getmMediaService().getmMediaPlayer().getCurrentPosition()));
             }
         });
         mImageNext.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +139,20 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 addToFavorite(view);
             }
         });
+        changeSeekbar();
+        updateImageLikeDislike();
+        mImageDislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickDislike();
+            }
+        });
+        mImageLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clickLike();
+            }
+        });
 
         if (!mActivityMusic.isServiceBound()) {
             mListPlaying = mFavoriteSongsProvider.listAllSongs();
@@ -170,8 +167,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             updateUI(mSongIndex);
         }
 
-        updateImageLikeDislike();
-
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
             ImageView mImageList = view.findViewById(R.id.playlist);
@@ -182,47 +177,40 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 }
             });
         }
+    }
 
-        mImageDislike.setOnClickListener(new View.OnClickListener() {
+    private void changeSeekbar(){
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onClick(View view) {
-                switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
-                    case 0:
-                    case 2:
-                        mListPlaying.get(mSongIndex).setIsFavorite(1);
-                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
-                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_selected);
-                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
-                        break;
-                    case 1:
-                        mListPlaying.get(mSongIndex).setIsFavorite(0);
-                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
-                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
-                        break;
-                }
-
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mActivityMusic.getmMediaService().seekTo(seekBar.getProgress());
+                mRunTime.setText(mDateFormat.format(
+                        mActivityMusic.getmMediaService().getmMediaPlayer().getCurrentPosition()));
             }
         });
-        mImageLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
-                    case 0:
-                    case 1:
-                        mListPlaying.get(mSongIndex).setIsFavorite(2);
-                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
-                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
-                        mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
-                        break;
-                    case 2:
-                        mListPlaying.get(mSongIndex).setIsFavorite(0);
-                        mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
-                        mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
-                        break;
-                }
-            }
-        });
+    }
 
+    private void clickLike() {
+        switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
+            case 0:
+            case 1:
+                mListPlaying.get(mSongIndex).setIsFavorite(2);
+                mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
+                mImageLike.setImageResource(R.drawable.ic_thumbs_up_selected);
+                mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
+                break;
+            case 2:
+                mListPlaying.get(mSongIndex).setIsFavorite(0);
+                mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
+                mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
+                break;
+        }
     }
 
     private void addToFavorite(View v) {
@@ -243,8 +231,28 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         popupMenu.show();
     }
 
+    private void clickDislike(){
+        switch (mListPlaying.get(mSongIndex).getIsFavorite()) {
+            case 0:
+            case 2:
+                mListPlaying.get(mSongIndex).setIsFavorite(1);
+                mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
+                mImageDislike.setImageResource(R.drawable.ic_thumbs_down_selected);
+                mImageLike.setImageResource(R.drawable.ic_thumbs_up_default);
+                break;
+            case 1:
+                mListPlaying.get(mSongIndex).setIsFavorite(0);
+                mFavoriteSongsProvider.update(mListPlaying.get(mSongIndex));
+                mImageDislike.setImageResource(R.drawable.ic_thumbs_down_default);
+                break;
+        }
+
+    }
 
 
+    /**
+     * Cập nhật image cho like/dislike
+     */
     private void updateImageLikeDislike(){
         Song song = mFavoriteSongsProvider.getSongByIdProvider(mListPlaying.get(mSongIndex).getIdProvider());
         switch (song.getIsFavorite()) {

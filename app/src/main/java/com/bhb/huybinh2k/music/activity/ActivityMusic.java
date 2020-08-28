@@ -61,6 +61,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private boolean mServiceBound = false;
     private int mOrientation;
     private StorageUtil storageUtil;
+    private androidx.appcompat.widget.Toolbar mToolbar;
 
     private MediaPlaybackFragment mMediaPlaybackFragment;
 
@@ -92,7 +93,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         return mServiceBound;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,14 +104,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
-        androidx.appcompat.widget.Toolbar mToolbar = findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        AllSongsFragment mAllSongsFragment = new AllSongsFragment();
-        mMediaPlaybackFragment = new MediaPlaybackFragment();
-        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setCheckedItem(R.id.nav_all);
-
 
         if (savedInstanceState != null) {
             mIsPlaying = savedInstanceState.getBoolean(IS_PLAYING);
@@ -120,8 +114,24 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             mServiceBound = savedInstanceState.getBoolean(SERVICE_BOUND);
             mFavorite = savedInstanceState.getBoolean(FAVORITE);
         }
-        mFavorite = storageUtil.loadIsFavorite();
 
+        checkOrentation();
+        addNavigation();
+
+        if (isMyServiceRunning(MediaPlaybackService.class)) {
+            Intent playerIntent = new Intent(this, MediaPlaybackService.class);
+            bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+            mServiceBound = true;
+        }
+    }
+
+
+    /**
+     * Kiểm tra Orentation và đổ fragment
+     */
+    private void checkOrentation() {
+        AllSongsFragment mAllSongsFragment = new AllSongsFragment();
+        mMediaPlaybackFragment = new MediaPlaybackFragment();
         mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
@@ -155,9 +165,19 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             }
 
         }
+    }
+
+
+    /**
+     * add Navigation
+     */
+    private void addNavigation() {
+        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
+        mFavorite = storageUtil.loadIsFavorite();
         if (mFavorite) {
             x = R.id.nav_favorite;
         } else {
@@ -167,41 +187,37 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_all:
-                        AllSongsFragment allSongsFragment = new AllSongsFragment();
-                        allSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frame_song, allSongsFragment)
-                                .commit();
-                        mFavorite = false;
-                        storageUtil.storeIsFavorite(mFavorite);
-                        break;
-                    case R.id.nav_favorite:
-                        FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
-                        favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.frame_song, favoriteSongsFragment)
-                                .commit();
-                        mFavorite = true;
-                        storageUtil.storeIsFavorite(mFavorite);
-                        break;
-                }
+                selectItemNavigation(menuItem);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-
-        if (isMyServiceRunning(MediaPlaybackService.class)) {
-            Intent playerIntent = new Intent(this, MediaPlaybackService.class);
-            bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-            mServiceBound = true;
-        }
     }
 
+    private void selectItemNavigation(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.nav_all:
+                AllSongsFragment allSongsFragment = new AllSongsFragment();
+                allSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_song, allSongsFragment)
+                        .commit();
+                mFavorite = false;
+                storageUtil.storeIsFavorite(mFavorite);
+                break;
+            case R.id.nav_favorite:
+                FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
+                favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.frame_song, favoriteSongsFragment)
+                        .commit();
+                mFavorite = true;
+                storageUtil.storeIsFavorite(mFavorite);
+                break;
+        }
+    }
 
     public final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
