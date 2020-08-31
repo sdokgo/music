@@ -40,12 +40,12 @@ public class SplashScreen extends AppCompatActivity {
         public void run() {
             try {
                 Thread.sleep(1000);
-                Intent intent = new Intent(SplashScreen.this, ActivityMusic.class);
-                startActivity(intent);
-                finish();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            Intent intent = new Intent(SplashScreen.this, ActivityMusic.class);
+            startActivity(intent);
+            finish();
         }
     };
 
@@ -76,11 +76,11 @@ public class SplashScreen extends AppCompatActivity {
             if (musicCursor.moveToFirst()) {
                 int id = 1;
                 do {
-                    String thisTitle = musicCursor.getString(
+                    String songTitle = musicCursor.getString(
                             musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    String thisArtist = musicCursor.getString(
+                    String songArtist = musicCursor.getString(
                             musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String songpath = musicCursor.getString(
+                    String songPath = musicCursor.getString(
                             musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                     long albumId = musicCursor.getLong(musicCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID));
@@ -94,7 +94,7 @@ public class SplashScreen extends AppCompatActivity {
 
                     long milliseconds = musicCursor.getLong(musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                     new FavoriteSongsProvider(this).insert(
-                            new Song(id, idProvider, thisTitle, songpath, thisArtist, albumArt, milliseconds)
+                            new Song(id, idProvider, songTitle, songPath, songArtist, albumArt, milliseconds)
                     );
                     id++;
 

@@ -3,6 +3,7 @@ package com.bhb.huybinh2k.music;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,7 +66,7 @@ public class StorageUtil {
 
     public int loadSongIndex() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        return mPreferences.getInt(SONG_INDEX, -1);
+        return mPreferences.getInt(SONG_INDEX, ActivityMusic.DEFAULT_VALUE);
     }
 
     public void storeShuffle(int x) {
@@ -77,7 +78,7 @@ public class StorageUtil {
 
     public int loadShuffle() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        return mPreferences.getInt(SHUFFLE, -1);
+        return mPreferences.getInt(SHUFFLE, ActivityMusic.DEFAULT_VALUE);
     }
 
     public void storeRepeat(int x) {
@@ -89,7 +90,7 @@ public class StorageUtil {
 
     public int loadRepeat() {
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        return mPreferences.getInt(REPEAT, -1);
+        return mPreferences.getInt(REPEAT, ActivityMusic.DEFAULT_VALUE);
     }
 
 //    public void clearListSongPlaying() {

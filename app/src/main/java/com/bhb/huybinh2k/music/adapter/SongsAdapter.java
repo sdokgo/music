@@ -18,20 +18,28 @@ import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
+import com.bhb.huybinh2k.music.fragment.MediaPlaybackFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> {
     private Context mContext;
-    private boolean isFavorite;
+    private boolean mIsFavorite;
     private List<Song> mList;
+    private int mPlayingIdProvider = -1;
+    private IOnClickSongListener mIOnClickSongListener;
+    private OnItemClickListener mListener;
+
+    public SongsAdapter(@NonNull Context context, @NonNull List<Song> objects, boolean isFavorite) {
+        this.mContext = context;
+        this.mList = objects;
+        this.mIsFavorite = isFavorite;
+    }
 
     public void setmPlayingIdProvider(int mPlayingIdProvider) {
         this.mPlayingIdProvider = mPlayingIdProvider;
     }
-
-    private int mPlayingIdProvider = -1;
 
     @NonNull
     @Override
@@ -40,17 +48,8 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    private IOnClickSongListener mIOnClickSongListener;
-
-    private OnItemClickListener mListener;
-
     public void setmIOnClickSongListener(IOnClickSongListener mIOnClickSongListener) {
         this.mIOnClickSongListener = mIOnClickSongListener;
-    }
-
-
-    public interface OnItemClickListener {
-        void onItemClick(View itemView, int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -74,16 +73,16 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
 
         if (song.getIdProvider() == mPlayingIdProvider) {
-            holder.stt.setVisibility(View.INVISIBLE);
+            holder.id.setVisibility(View.INVISIBLE);
             holder.songName.setTypeface(Typeface.DEFAULT_BOLD);
-            holder.imgstt.setVisibility(View.VISIBLE);
+            holder.imageId.setVisibility(View.VISIBLE);
         } else {
-            holder.stt.setVisibility(View.VISIBLE);
+            holder.id.setVisibility(View.VISIBLE);
             holder.songName.setTypeface(Typeface.DEFAULT);
-            holder.imgstt.setVisibility(View.INVISIBLE);
+            holder.imageId.setVisibility(View.INVISIBLE);
         }
 
-        holder.stt.setText(String.valueOf(song.getId()));
+        holder.id.setText(String.valueOf(song.getId()));
         holder.songName.setText(song.getSongName());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("m:ss");
         String duration = simpleDateFormat.format(song.getDuration());
@@ -99,13 +98,13 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
 
     private void createPopupMenu(View v, final Song song) {
         PopupMenu popupMenu = new PopupMenu(mContext, v);
-        if (isFavorite) {
+        if (mIsFavorite) {
             popupMenu.getMenuInflater().inflate(R.menu.remove_from_favorite, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     if (item.getItemId() == R.id.removeFromFavorite) {
-                        song.setIsFavorite(0);
+                        song.setIsFavorite(MediaPlaybackFragment.DEFAULT_FAVORITE);
                         new FavoriteSongsProvider(mContext).update(song);
                         mList.remove(song);
                         notifyDataSetChanged();
@@ -120,7 +119,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     if (item.getItemId() == R.id.addToFavorite) {
-                        song.setIsFavorite(2);
+                        song.setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
                         new FavoriteSongsProvider(mContext).update(song);
                         Toast.makeText(mContext, R.string.add_succes, Toast.LENGTH_SHORT).show();
                     }
@@ -137,25 +136,26 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return mList.size();
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(View itemView, int position);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView stt, songName, time;
-        private ImageView imgstt, imageView;
+        private TextView id;
+        private TextView songName;
+        private TextView time;
+        private ImageView imageId;
+        private ImageView imageView;
 
         public ViewHolder(@NonNull final View itemView) {
             super(itemView);
-            stt =itemView.findViewById(R.id.textstt);
-            songName =itemView.findViewById(R.id.tenbaihat);
+            id = itemView.findViewById(R.id.textstt);
+            songName = itemView.findViewById(R.id.tenbaihat);
             time = itemView.findViewById(R.id.thoigian);
-            imgstt = itemView.findViewById(R.id.imgstt);
-            imageView =itemView.findViewById(R.id.threedot);
+            imageId = itemView.findViewById(R.id.imgstt);
+            imageView = itemView.findViewById(R.id.threedot);
         }
-    }
-
-    public SongsAdapter(@NonNull Context context, @NonNull List<Song> objects, boolean isFavorite) {
-        this.mContext = context;
-        this.mList = objects;
-        this.isFavorite = isFavorite;
     }
 
 }

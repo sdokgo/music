@@ -26,6 +26,7 @@ import androidx.core.app.TaskStackBuilder;
 import android.media.session.MediaSessionManager;
 
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
+import com.bhb.huybinh2k.music.fragment.MediaPlaybackFragment;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,41 +35,43 @@ import java.util.Random;
 public class MediaPlaybackService extends Service implements MediaPlayer.OnCompletionListener,
         MediaPlayer.OnPreparedListener {
 
-    public MediaPlayer getmMediaPlayer() {
-        return mMediaPlayer;
-    }
-
-    private MediaPlayer mMediaPlayer;
     private static final String ACTION_PLAY = "com.bhb.huybinh2k.ACTION_PLAY";
     private static final String ACTION_PAUSE = "com.bhb.huybinh2k.ACTION_PAUSE";
     private static final String ACTION_PREVIOUS = "com.bhb.huybinh2k.ACTION_PREVIOUS";
     private static final String ACTION_NEXT = "com.bhb.huybinh2k.ACTION_NEXT";
+    private static final int PLAY = 0;
+    private static final int PAUSE = 1;
+    private static final int PREVIOUS = 3;
+    private static final int NEXT = 2;
     private static final String CHANNEL_ID = "com.bhb.huybinh2k.CHANNEL_ID";
     private static final int NOTIFICATION_ID = 101;
-    private List<Song> mSongListService;
     private static final int SONG_CHANGE = 1;
     private static final int PLAY_SONG = 2;
     private static final int PAUSE_SONG = 3;
+    private final IBinder mIBinder = new LocalBinder();
+    private MediaPlayer mMediaPlayer;
+    private List<Song> mSongListService;
+    private boolean mIsPlaying;
+    private int mSongIndexService;
+    private Song mActiveSongService;
+    private MediaSessionManager mMediaSessionManager;
+    private MediaSessionCompat mMediaSession;
+    private MediaControllerCompat.TransportControls mTransportControls;
+    private int mShuffle;
+    private int mRepeat;
+    private int mResumePosition;
+
+    public MediaPlayer getmMediaPlayer() {
+        return mMediaPlayer;
+    }
 
     public boolean getmIsPlaying() {
         return mIsPlaying;
     }
 
-    private boolean mIsPlaying = false;
-
     public int getmSongIndexService() {
         return mSongIndexService;
     }
-
-    private int mSongIndexService;
-    private Song mActiveSongService;
-
-    private MediaSessionManager mMediaSessionManager;
-    private MediaSessionCompat mMediaSession;
-    private MediaControllerCompat.TransportControls mTransportControls;
-    private int mShuffle, mRepeat;
-    private int mResumePosition;
-
 
     /**
      * Cập nhật trạng thái của shuffle và repeat
@@ -77,10 +80,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mShuffle = a;
         mRepeat = b;
     }
-    public void updateListSong(List <Song> list){
+
+    public void updateListSong(List<Song> list) {
         mSongListService = list;
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -93,7 +96,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             mSongIndexService = mStorageUtil.loadSongIndex();
             mShuffle = mStorageUtil.loadShuffle();
             mRepeat = mStorageUtil.loadRepeat();
-            if (mSongIndexService != -1 && mSongIndexService < mSongListService.size()) {
+            if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
                 mActiveSongService = mSongListService.get(mSongIndexService);
             } else {
                 stopSelf();
@@ -117,13 +120,12 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         return super.onStartCommand(intent, flags, startId);
     }
 
-
     /**
      * Phát bài hát mới
      */
     public void playNewSong() {
         mSongIndexService = new StorageUtil(getApplicationContext()).loadSongIndex();
-        if (mSongIndexService != -1 && mSongIndexService < mSongListService.size()) {
+        if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
             mActiveSongService = mSongListService.get(mSongIndexService);
         } else {
             stopSelf();
@@ -139,7 +141,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     /**
      * Khởi tạo MediaSession
      */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initMediaSession() {
         if (mMediaSessionManager != null) return;
         mMediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
@@ -210,22 +211,21 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private void sendBroadcast(int x) {
         Intent intent = new Intent();
         intent.setAction(ActivityMusic.BROADCAST_RECEIVER);
-        switch (x){
+        switch (x) {
             case SONG_CHANGE:
                 intent.putExtra(ActivityMusic.GET_SONG_INDEX, mSongIndexService);
                 sendBroadcast(intent);
                 break;
             case PLAY_SONG:
-                intent.putExtra(ActivityMusic.PLAY_PAUSE, 1);
+                intent.putExtra(ActivityMusic.PLAY_PAUSE, ActivityMusic.PAUSE);
                 sendBroadcast(intent);
                 break;
             case PAUSE_SONG:
-                intent.putExtra(ActivityMusic.PLAY_PAUSE, 0);
+                intent.putExtra(ActivityMusic.PLAY_PAUSE, ActivityMusic.PLAYING);
                 sendBroadcast(intent);
                 break;
         }
     }
-
 
     /**
      * Khởi tạo MediaPlayer
@@ -294,7 +294,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      */
     private void completeSong() {
         //Nếu chọn repeat chỉ 1 bài hát thì chạy lại bài hát vừa kết thúc
-        if (mRepeat == 2) {
+        if (mRepeat == MediaPlaybackFragment.REPEAT_ONE) {
             stopMedia();
             mMediaPlayer.reset();
             initMediaPlayer();
@@ -304,7 +304,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
 
             sendBroadcast(SONG_CHANGE);
             //Nếu chọn shuffle và repeat khác chỉ 1 bài hát thì phát 1 bài ngẫu nhiên
-        } else if (mShuffle == 1) {
+        } else if (mShuffle == MediaPlaybackFragment.SHUFFLE) {
             Random random = new Random();
             int r = random.nextInt(mSongListService.size());
             while (r == mSongIndexService) {
@@ -322,12 +322,12 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             sendBroadcast(SONG_CHANGE);
 
             //Nếu ko chọn cả repeat và shuffle thì dừng
-        } else if ((mRepeat == 0) && (mShuffle == 0)) {
+        } else if ((mRepeat == MediaPlaybackFragment.NO_REPEAT) && (mShuffle == MediaPlaybackFragment.NO_SHUFFLE)) {
             sendBroadcast(PAUSE_SONG);
             stopMedia();
             buildNotification(PlaybackStatus.PAUSE);
             //Nếu chọn phát lại cả danh sách bài hát và ko chọn shuffle
-        } else if ((mRepeat == 1) && (mShuffle == 0)) {
+        } else if ((mRepeat == MediaPlaybackFragment.REPEAT_ALL) && (mShuffle == MediaPlaybackFragment.NO_SHUFFLE)) {
             skipToNext();
             updateMetaData();
             buildNotification(PlaybackStatus.PLAYING);
@@ -348,7 +348,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
     }
 
-
     /**
      * phát bài hát tiếp theo
      */
@@ -364,7 +363,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mMediaPlayer.reset();
         initMediaPlayer();
     }
-
 
     /**
      * phát bài hát trước đó
@@ -382,7 +380,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         initMediaPlayer();
     }
 
-
     /**
      * Cập nhật lại dữ liệu cho MediaSession
      */
@@ -393,19 +390,18 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 .build());
     }
 
-
     /**
      * Tạo Notification
      */
     public void buildNotification(PlaybackStatus playbackStatus) {
         int notiAction = 0;
-        PendingIntent play_pauseAction = null;
+        PendingIntent playPauseAction = null;
         if (playbackStatus == PlaybackStatus.PLAYING) {
             notiAction = R.drawable.ic_pause_notification;
-            play_pauseAction = playbackAction(1);
+            playPauseAction = playbackAction(PAUSE);
         } else if (playbackStatus == PlaybackStatus.PAUSE) {
             notiAction = R.drawable.ic_play_notification;
-            play_pauseAction = playbackAction(0);
+            playPauseAction = playbackAction(PLAY);
         }
         Bitmap largeIcon;
         try {
@@ -433,15 +429,14 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 .setContentText(mActiveSongService.getArtist())
                 .setContentTitle(mActiveSongService.getSongName())
                 .setContentIntent(resultPendingIntent)
-                .addAction(R.drawable.ic_previous, getString(R.string.previous), playbackAction(3))
-                .addAction(notiAction, getString(R.string.pause), play_pauseAction)
-                .addAction(R.drawable.ic_next, getString(R.string.next), playbackAction(2));
+                .addAction(R.drawable.ic_previous, getString(R.string.previous), playbackAction(PREVIOUS))
+                .addAction(notiAction, getString(R.string.pause), playPauseAction)
+                .addAction(R.drawable.ic_next, getString(R.string.next), playbackAction(NEXT));
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(NOTIFICATION_ID, notificationBuilder.build());
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build());
     }
-
 
     /**
      * loại bỏ notification
@@ -451,7 +446,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
     }
-
 
     /**
      * tạo channel cho notification
@@ -465,23 +459,22 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
     }
 
-
     /**
      * PendingIntent cho các sự kiện click action trong notification
      */
     private PendingIntent playbackAction(int actionNumber) {
         Intent playbackAction = new Intent(this, MediaPlaybackService.class);
         switch (actionNumber) {
-            case 0:
+            case PLAY:
                 playbackAction.setAction(ACTION_PLAY);
                 return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 1:
+            case PAUSE:
                 playbackAction.setAction(ACTION_PAUSE);
                 return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 2:
+            case NEXT:
                 playbackAction.setAction(ACTION_NEXT);
                 return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 3:
+            case PREVIOUS:
                 playbackAction.setAction(ACTION_PREVIOUS);
                 return PendingIntent.getService(this, actionNumber, playbackAction, 0);
             default:
@@ -509,7 +502,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         }
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -528,8 +520,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     public void onPrepared(MediaPlayer mediaPlayer) {
         playMedia();
     }
-
-    private final IBinder mIBinder = new LocalBinder();
 
     @Override
     public IBinder onBind(Intent intent) {

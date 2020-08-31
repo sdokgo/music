@@ -21,22 +21,22 @@ import java.util.List;
 
 
 public class SearchFragment extends BaseSongListFragment {
-    private SearchView searchView;
-    private List<Song> listSerach;
+    private SearchView mSearchView;
+    private List<Song> mListAllSong;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-        favoriteSongsProvider = new FavoriteSongsProvider(getContext());
-        searchView = view.findViewById(R.id.searchview);
+        mFavoriteSongsProvider = new FavoriteSongsProvider(getContext());
+        mSearchView = view.findViewById(R.id.searchview);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        listSerach = favoriteSongsProvider.listAllSongs();
+        mListAllSong = mFavoriteSongsProvider.listAllSongs();
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mList.clear();
@@ -65,11 +65,12 @@ public class SearchFragment extends BaseSongListFragment {
                 mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);
-                if (mList.get(position).getCountOfPlay() == 3 && mList.get(position).getIsFavorite() == 0) {
-                    mList.get(position).setIsFavorite(2);
-                    favoriteSongsProvider.update(mList.get(position));
+                if (mList.get(position).getCountOfPlay() == 3 &&
+                        mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
+                    mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
+                    mFavoriteSongsProvider.update(mList.get(position));
                 }
-                mActivityMusic.playAudio(index, listSerach);
+                mActivityMusic.playAudio(index, mListAllSong);
                 mActivityMusic.setmIsPlaying(true);
                 getFragmentManager().popBackStack();
                 if (mActivityMusic.getmFavorite()) {

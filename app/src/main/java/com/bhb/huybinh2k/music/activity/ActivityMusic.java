@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
+import com.bhb.huybinh2k.music.LogSetting;
 import com.bhb.huybinh2k.music.MediaPlaybackService;
 import com.bhb.huybinh2k.music.PlaybackStatus;
 import com.bhb.huybinh2k.music.R;
@@ -44,25 +45,78 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public static final String GET_SONG_INDEX = "com.bhb.huybinh2k.GET_SONG_INDEX";
     public static final String PLAY_PAUSE = "com.bhb.huybinh2k.PLAY_PAUSE";
     public static final String BROADCAST_RECEIVER = "com.bhb.huybinh2k.BROADCAST_RECEIVER";
+    public static final int DEFAULT_VALUE = -1;
+    public static final int PLAYING = 0;
+    public static final int PAUSE = 1;
     private static final String SERVICE_BOUND = "com.bhb.huybinh2k.SERVICE_BOUND";
     private static final String IS_PLAYING = "com.bhb.huybinh2k.IS_PLAYING";
     private static final String RESUME_POSITION = "com.bhb.huybinh2k.RESUME_POSITION";
     private static final String FAVORITE = "com.bhb.huybinh2k.FAVORITE";
+    IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
+    IUpdateAllSongsFragment mIUpdateAllSongsFragment;
     private MediaPlaybackService mMediaService;
     private RelativeLayout mLayoutPlayBar;
-    private ImageView mImagePause,
-            mImageSong;
-    private TextView mTextViewSong,
-            mTextViewSinger;
-    private int mResumePosition = -1;
-    private boolean mFavorite = false;
+    private ImageView mImagePause;
+    private ImageView mImageSong;
+    private TextView mTextViewSong;
+    private TextView mTextViewSinger;
+    private int mResumePosition;
+    private boolean mFavorite;
     private boolean mIsPlaying;
-    private boolean mIsBack = false;
-    private boolean mServiceBound = false;
+    /**
+     * Nhận BroadcastReceiver
+     */
+    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int songIndex = intent.getIntExtra(GET_SONG_INDEX, DEFAULT_VALUE);
+            int x = intent.getIntExtra(PLAY_PAUSE, DEFAULT_VALUE);
+            if (x != DEFAULT_VALUE) {
+                if (x == PAUSE) {
+                    mIsPlaying = false;
+                } else {
+                    mIsPlaying = true;
+                }
+                playPauseReceiver();
+            }
+            if (songIndex != DEFAULT_VALUE) {
+                mIsPlaying = true;
+                updateUIPlayBar(songIndex);
+            }
+        }
+    };
+    private boolean mIsBack;
+    private boolean mServiceBound;
     private int mOrientation;
-    private StorageUtil storageUtil;
-    private androidx.appcompat.widget.Toolbar mToolbar;
+    public final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
+            mMediaService = binder.getService();
+            if (!mFavorite) {
+                mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
+            }
+            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mIUpdateMediaPlaybackFragment.update(mMediaService.getmSongIndexService());
+            }
+            if (!mMediaService.getmIsPlaying()) {
+                mImagePause.setImageResource(R.drawable.ic_play);
+                mIsPlaying = false;
+            } else {
+                mImagePause.setImageResource(R.drawable.ic_pause);
+                mIsPlaying = true;
+            }
+            mServiceBound = true;
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mServiceBound = false;
+        }
+    };
+    private StorageUtil mStorageUtil;
+    private androidx.appcompat.widget.Toolbar mToolbar;
+    private LogSetting mLogSetting = new LogSetting();
     private MediaPlaybackFragment mMediaPlaybackFragment;
 
     public boolean getmFavorite() {
@@ -96,11 +150,13 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("log", "onCreateActivity");
+        if (mLogSetting.IS_DEBUG) {
+            Log.d("log", "onCreateActivity");
+        }
         setContentView(R.layout.activity_music);
         mLayoutPlayBar = findViewById(R.id.layoutPlayBar);
         mImagePause = findViewById(R.id.playBar_Pause);
-        storageUtil = new StorageUtil(this);
+        mStorageUtil = new StorageUtil(this);
         mImageSong = findViewById(R.id.img_playbar);
         mTextViewSong = findViewById(R.id.tenbaihat_playbar);
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
@@ -124,7 +180,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             mServiceBound = true;
         }
     }
-
 
     /**
      * Kiểm tra Orentation và đổ fragment
@@ -167,7 +222,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
     }
 
-
     /**
      * add Navigation
      */
@@ -177,7 +231,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
-        mFavorite = storageUtil.loadIsFavorite();
+        mFavorite = mStorageUtil.loadIsFavorite();
         if (mFavorite) {
             x = R.id.nav_favorite;
         } else {
@@ -205,7 +259,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         .replace(R.id.frame_song, allSongsFragment)
                         .commit();
                 mFavorite = false;
-                storageUtil.storeIsFavorite(mFavorite);
                 break;
             case R.id.nav_favorite:
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
@@ -214,48 +267,19 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                         .replace(R.id.frame_song, favoriteSongsFragment)
                         .commit();
                 mFavorite = true;
-                storageUtil.storeIsFavorite(mFavorite);
+
                 break;
         }
+        mStorageUtil.storeIsFavorite(mFavorite);
     }
-
-    public final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
-            mMediaService = binder.getService();
-            if (!mFavorite) {
-                mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
-            }
-            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mIUpdateMediaPlaybackFragment.update(mMediaService.getmSongIndexService());
-            }
-            if (!mMediaService.getmIsPlaying()) {
-                mImagePause.setImageResource(R.drawable.ic_play);
-                mIsPlaying = false;
-            } else {
-                mImagePause.setImageResource(R.drawable.ic_pause);
-                mIsPlaying = true;
-            }
-            mServiceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mServiceBound = false;
-        }
-    };
-
 
     /**
      * Phát bài hát, start service và bind service
      */
     public void playAudio(int songIndex, List<Song> list) {
-        StorageUtil storage = new StorageUtil(this);
-        storage.storeListSongPlaying(list);
-        storage.storeSongIndex(songIndex);
+        mStorageUtil.storeListSongPlaying(list);
+        mStorageUtil.storeSongIndex(songIndex);
         if (!mServiceBound) {
-
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
             startService(playerIntent);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -321,35 +345,12 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
     }
 
-
-    /**
-     * Nhận BroadcastReceiver
-     */
-    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int i = intent.getIntExtra(GET_SONG_INDEX, -1);
-            int x = intent.getIntExtra(PLAY_PAUSE, -1);
-            if (x != -1) {
-                if (x == 1) {
-                    mIsPlaying = false;
-                } else {
-                    mIsPlaying = true;
-                }
-                playPauseReceiver();
-            }
-            if (i != -1) {
-                mIsPlaying = true;
-                updateUIPlayBar(i);
-            }
-        }
-    };
-
-
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("log", "onStartActivity");
+        if (mLogSetting.IS_DEBUG) {
+            Log.d("log", "onStartActivity");
+        }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BROADCAST_RECEIVER);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -358,20 +359,24 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("log", "onStopActivity");
+        if (mLogSetting.IS_DEBUG) {
+            Log.d("log", "onStopActivity");
+        }
         unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("log", "onDestroyActivity");
+        if (mLogSetting.IS_DEBUG) {
+            Log.d("log", "onDestroyActivity");
+        }
         if (isFinishing()) {
             if (!mIsPlaying) {
                 unbindService(mServiceConnection);
                 mMediaService.stopSelf();
-                storageUtil.storeSongIndex(-1);
-                storageUtil.storeIsFavorite(false);
+                mStorageUtil.storeSongIndex(DEFAULT_VALUE);
+                mStorageUtil.storeIsFavorite(false);
             }
         }
 
@@ -380,15 +385,17 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
     @Override
     public void onBackPressed() {
-        Log.d("log", "BackPressed");
+        if (mLogSetting.IS_DEBUG) {
+            Log.d("log", "BackPressed");
+        }
         super.onBackPressed();
         if (!mIsBack) {
             if (mServiceBound) {
                 if (!mIsPlaying) {
                     unbindService(mServiceConnection);
                     mMediaService.stopSelf();
-                    storageUtil.storeSongIndex(-1);
-                    storageUtil.storeIsFavorite(false);
+                    mStorageUtil.storeSongIndex(DEFAULT_VALUE);
+                    mStorageUtil.storeIsFavorite(false);
                 }
             }
         }
@@ -448,24 +455,20 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
     }
 
-    public interface IUpdateMediaPlaybackFragment {
-        void update(int songindex);
-    }
-
     public void setmIUpdateMediaPlaybackFragment(IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment) {
         this.mIUpdateMediaPlaybackFragment = mIUpdateMediaPlaybackFragment;
     }
 
-    IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
+    public void setmIUpdateAllSongsFragment(IUpdateAllSongsFragment mIUpdateAllSongsFragment) {
+        this.mIUpdateAllSongsFragment = mIUpdateAllSongsFragment;
+    }
+
+    public interface IUpdateMediaPlaybackFragment {
+        void update(int songindex);
+    }
 
     public interface IUpdateAllSongsFragment {
         void update(int songIndex);
-    }
-
-    IUpdateAllSongsFragment mIUpdateAllSongsFragment;
-
-    public void setmIUpdateAllSongsFragment(IUpdateAllSongsFragment mIUpdateAllSongsFragment) {
-        this.mIUpdateAllSongsFragment = mIUpdateAllSongsFragment;
     }
 
 }

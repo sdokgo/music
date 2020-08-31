@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
+import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.SongsAdapter;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mList = favoriteSongsProvider.listFavorite();
+        mList = mFavoriteSongsProvider.listFavorite();
         if (mList.size() == 0)
             Toast.makeText(getContext(), R.string.add_song_to_favorite, Toast.LENGTH_SHORT).show();
         mAdapter = new SongsAdapter(getContext(), mList, true);
@@ -37,11 +38,11 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
         int i = new StorageUtil(getContext()).loadSongIndex();
         List<Song> listPlaying = new StorageUtil(getContext()).loadListSongPlaying();
         if (listPlaying != null) {
-            if (mActivityMusic.getmFavorite() && listPlaying.size() != favoriteSongsProvider.listFavorite().size()) {
-                mList = favoriteSongsProvider.listFavorite();
+            if (mActivityMusic.getmFavorite() && listPlaying.size() != mFavoriteSongsProvider.listFavorite().size()) {
+                mList = mFavoriteSongsProvider.listFavorite();
             }
         }
-        if (i != -1) update(i);
+        if (i != ActivityMusic.DEFAULT_VALUE) update(i);
         clickSong();
     }
 
