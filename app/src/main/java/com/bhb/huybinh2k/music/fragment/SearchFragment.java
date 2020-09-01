@@ -42,7 +42,7 @@ public class SearchFragment extends BaseSongListFragment {
                 mList.clear();
                 List<Song> list = new FavoriteSongsProvider(getContext()).searchSongByName(s);
                 mList.addAll(list);
-                if (mList.size() == 0) {
+                if (mList.isEmpty()) {
                     Toast.makeText(getContext(), R.string.no_search_results, Toast.LENGTH_SHORT).show();
                 }
                 mAdapter.notifyDataSetChanged();

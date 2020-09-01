@@ -29,7 +29,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mList = mFavoriteSongsProvider.listFavorite();
-        if (mList.size() == 0)
+        if (mList.isEmpty())
             Toast.makeText(getContext(), R.string.add_song_to_favorite, Toast.LENGTH_SHORT).show();
         mAdapter = new SongsAdapter(getContext(), mList, true);
 
