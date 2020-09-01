@@ -61,7 +61,7 @@ public class SearchFragment extends BaseSongListFragment {
         mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                int index = mList.get(position).getId() - 1;
+                int index = mList.get(position).getId() - 1; //todo
                 mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);

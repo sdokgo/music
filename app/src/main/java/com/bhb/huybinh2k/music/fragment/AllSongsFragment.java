@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.bhb.huybinh2k.music.LogSetting;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
 import com.bhb.huybinh2k.music.activity.ActivityMusic;
@@ -19,16 +21,16 @@ import java.util.List;
 public class AllSongsFragment extends BaseSongListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onCreateViewAllSongsFragment");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(ActivityMusic.TAG, "onCreateViewAllSongsFragment");
         }
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onCreateViewAllSongsFragment");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(ActivityMusic.TAG, "onCreateViewAllSongsFragment");
         }
         mList.clear();
         mList = mFavoriteSongsProvider.listAllSongs();
@@ -36,7 +38,7 @@ public class AllSongsFragment extends BaseSongListFragment {
 
         super.onViewCreated(view, savedInstanceState);
 
-        int i = new StorageUtil(getContext()).loadSongIndex();
+        int index = new StorageUtil(getContext()).loadSongIndex();
         List<Song> listPlaying = new StorageUtil(getContext()).loadListSongPlaying();
         if (listPlaying != null) {
             if (!mActivityMusic.getmFavorite() && listPlaying.size() != mFavoriteSongsProvider.listAllSongs().size()) {
@@ -44,23 +46,23 @@ public class AllSongsFragment extends BaseSongListFragment {
             }
         }
 
-        if (i != ActivityMusic.DEFAULT_VALUE && listPlaying.size() == mList.size()) update(i);
+        if (index != ActivityMusic.DEFAULT_VALUE && listPlaying.size() == mList.size()) update(index);
         clickSong();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onStartAllSongsFragment");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(ActivityMusic.TAG, "onStartAllSongsFragment");
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onStopAllSongsFragment");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(ActivityMusic.TAG, "onStopAllSongsFragment");
         }
     }
 }

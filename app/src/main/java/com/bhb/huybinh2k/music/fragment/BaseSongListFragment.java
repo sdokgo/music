@@ -33,6 +33,7 @@ import java.util.List;
 
 public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpdateAllSongsFragment {
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
+    private static final int MIN_COUNT_ADD_TO_FAVORITE = 3 ;
     protected List<Song> mList = new ArrayList<>();
     protected RecyclerView mRecyclerView;
     protected ActivityMusic mActivityMusic;
@@ -43,7 +44,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     protected boolean mReplace;
     protected MediaPlaybackFragment mMediaPlaybackFragment;
     protected SongsAdapter mAdapter;
-    protected LogSetting mLogSetting = new LogSetting();
     /**
      * Nhận BroadcastReceiver từ service
      */
@@ -81,7 +81,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mActivityMusic.setmIUpdateAllSongsFragment(this);
+        mActivityMusic.setIUpdateAllSongsFragment(this);
 
         if (savedInstanceState != null) {
             mSongIndex = savedInstanceState.getInt(SONG_INDEX);
@@ -116,7 +116,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);
-                if (mList.get(position).getCountOfPlay() == 3 &&
+                if (mList.get(position).getCountOfPlay() == MIN_COUNT_ADD_TO_FAVORITE &&
                         mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
                     mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
                     mFavoriteSongsProvider.update(mList.get(position));

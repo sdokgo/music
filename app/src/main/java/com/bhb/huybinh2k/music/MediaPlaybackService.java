@@ -88,7 +88,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
+//        try {
 
             createNotificationChannel();
             StorageUtil mStorageUtil = new StorageUtil(getApplicationContext());
@@ -103,10 +103,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 mIsPlaying = false;
             }
 
-        } catch (NullPointerException e) {
+//        } catch (NullPointerException e) {
             stopSelf();
             mIsPlaying = false;
-        }
+//        }
         if (mMediaSessionManager == null) {
             initMediaSession();
             initMediaPlayer();
@@ -239,6 +239,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         try {
             mMediaPlayer.setDataSource(mActiveSongService.getSongPath());
         } catch (IOException e) {
+            // setDataSource bat buoc co try catch IOException
             e.printStackTrace();
             stopSelf();
         }

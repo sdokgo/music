@@ -80,6 +80,11 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             Log.d("log", "onCreateViewMediaPlaybackFragment");
         }
         View view = inflater.inflate(R.layout.fragment_media_playback, container, false);
+        initView(view);
+        return view;
+    }
+
+    private void initView(View view){
         mImageSong = view.findViewById(R.id.img_song);
         mSongName = view.findViewById(R.id.tenbaihat_media);
         mSinger = view.findViewById(R.id.tencasi_media);
@@ -97,22 +102,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageShuffle = view.findViewById(R.id.shuffle);
         mImageRepeat = view.findViewById(R.id.repeat);
         mLayoutPlayBar = getActivity().findViewById(R.id.layoutPlayBar);
-        return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onViewCreatedViewMediaPlaybackFragment");
-        }
-        super.onViewCreated(view, savedInstanceState);
-        mSongIndex = mStorageUtil.loadSongIndex();
-        mFavoriteSongsProvider = new FavoriteSongsProvider(getContext());
-        mOrientation = getResources().getConfiguration().orientation;
-        updateImageRepeatShuffle();
-        mActivityMusic = (ActivityMusic) getActivity();
-        mActivityMusic.setmIUpdateMediaPlaybackFragment(this);
-
         mImageShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,8 +138,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 addToFavorite(view);
             }
         });
-        changeSeekBar();
-        updateImageLikeDislike();
         mImageDislike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -163,6 +150,23 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                 clickLike();
             }
         });
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onViewCreatedViewMediaPlaybackFragment");
+        }
+        super.onViewCreated(view, savedInstanceState);
+        mSongIndex = mStorageUtil.loadSongIndex();
+        mFavoriteSongsProvider = new FavoriteSongsProvider(getContext());
+        mOrientation = getResources().getConfiguration().orientation;
+        updateImageRepeatShuffle();
+        mActivityMusic = (ActivityMusic) getActivity();
+        mActivityMusic.setIUpdateMediaPlaybackFragment(this);
+
+        changeSeekBar();
+        updateImageLikeDislike();
 
         if (!mActivityMusic.isServiceBound()) {
             mListPlaying = mFavoriteSongsProvider.listAllSongs();
@@ -503,8 +507,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onStart() {
         super.onStart();
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onStartMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onStartMediaPlaybackFragment");
         }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ActivityMusic.BROADCAST_RECEIVER);
@@ -522,8 +526,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onCreateMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onCreateMediaPlaybackFragment");
         }
         mStorageUtil = new StorageUtil(getActivity().getApplicationContext());
         mShuffle = mStorageUtil.loadShuffle();
@@ -533,8 +537,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onPause() {
         super.onPause();
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onPauseMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onPauseMediaPlaybackFragment");
         }
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mLockScreen = true;
@@ -545,8 +549,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onStop() {
         super.onStop();
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onStopMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onStopMediaPlaybackFragment");
         }
         getActivity().unregisterReceiver(mBroadcastReceiver);
     }
@@ -554,8 +558,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onDestroyViewMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onDestroyViewMediaPlaybackFragment");
         }
         mStorageUtil.storeRepeat(mRepeat);
         mStorageUtil.storeShuffle(mShuffle);
@@ -567,8 +571,8 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mLogSetting.IS_DEBUG){
-            Log.d("log", "onDestroyViewMediaPlaybackFragment");
+        if (LogSetting.IS_DEBUG){
+            Log.d(ActivityMusic.TAG, "onDestroyViewMediaPlaybackFragment");
         }
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mLayoutPlayBar.setVisibility(View.VISIBLE);
@@ -578,7 +582,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
     }
 
     @Override
-    public void update(int songindex) {
-        updateUI(songindex);
+    public void update(int songIndex) {
+        updateUI(songIndex);
     }
 }

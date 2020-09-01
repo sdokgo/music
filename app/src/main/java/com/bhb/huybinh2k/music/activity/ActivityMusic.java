@@ -48,6 +48,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public static final int DEFAULT_VALUE = -1;
     public static final int PLAYING = 0;
     public static final int PAUSE = 1;
+    public static final String TAG = "log";
     private static final String SERVICE_BOUND = "com.bhb.huybinh2k.SERVICE_BOUND";
     private static final String IS_PLAYING = "com.bhb.huybinh2k.IS_PLAYING";
     private static final String RESUME_POSITION = "com.bhb.huybinh2k.RESUME_POSITION";
@@ -116,7 +117,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     };
     private StorageUtil mStorageUtil;
     private androidx.appcompat.widget.Toolbar mToolbar;
-    private LogSetting mLogSetting = new LogSetting();
     private MediaPlaybackFragment mMediaPlaybackFragment;
 
     public boolean getmFavorite() {
@@ -150,8 +150,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onCreateActivity");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "onCreateActivity");
         }
         setContentView(R.layout.activity_music);
         mLayoutPlayBar = findViewById(R.id.layoutPlayBar);
@@ -348,8 +348,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     public void onStart() {
         super.onStart();
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onStartActivity");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "onStartActivity");
         }
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BROADCAST_RECEIVER);
@@ -359,8 +359,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     protected void onStop() {
         super.onStop();
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onStopActivity");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "onStopActivity");
         }
         unregisterReceiver(mBroadcastReceiver);
     }
@@ -368,8 +368,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "onDestroyActivity");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "onDestroyActivity");
         }
         if (isFinishing()) {
             if (!mIsPlaying) {
@@ -385,8 +385,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
 
     @Override
     public void onBackPressed() {
-        if (mLogSetting.IS_DEBUG) {
-            Log.d("log", "BackPressed");
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "BackPressed");
         }
         super.onBackPressed();
         if (!mIsBack) {
@@ -455,16 +455,16 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
     }
 
-    public void setmIUpdateMediaPlaybackFragment(IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment) {
+    public void setIUpdateMediaPlaybackFragment(IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment) {
         this.mIUpdateMediaPlaybackFragment = mIUpdateMediaPlaybackFragment;
     }
 
-    public void setmIUpdateAllSongsFragment(IUpdateAllSongsFragment mIUpdateAllSongsFragment) {
+    public void setIUpdateAllSongsFragment(IUpdateAllSongsFragment mIUpdateAllSongsFragment) {
         this.mIUpdateAllSongsFragment = mIUpdateAllSongsFragment;
     }
 
     public interface IUpdateMediaPlaybackFragment {
-        void update(int songindex);
+        void update(int songIndex);
     }
 
     public interface IUpdateAllSongsFragment {

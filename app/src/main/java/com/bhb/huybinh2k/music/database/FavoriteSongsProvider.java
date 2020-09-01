@@ -19,19 +19,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         SongDatabaseHelper helper = new SongDatabaseHelper(context);
         this.mDatabase = helper.getWritableDatabase();
     }
-//    public static final String ALL_SONGS_TABLE = SongDatabaseHelper.ALL_SONGS_TABLE;
-//    public static final String ID = SongDatabaseHelper.ID;
-//    public static final String ID_PROVIDER = SongDatabaseHelper.ID_PROVIDER;
-//    public static final String SONG_NAME = SongDatabaseHelper.SONG_NAME;
-//    public static final String SONG_PATH = SongDatabaseHelper.SONG_PATH;
-//    public static final String SONG_ARTIST = SongDatabaseHelper.SONG_ARTIST;
-//    public static final String IMAGE_PATH = SongDatabaseHelper.IMAGE_PATH;
-//    public static final String DURATION = SongDatabaseHelper.DURATION;
-//    public static final String FAVORITE = SongDatabaseHelper.FAVORITE;
-//    public static final String COUNT_OF_PLAY = SongDatabaseHelper.COUNT_OF_PLAY;
-
-    public void insert(Song song)
-    {
+    public void insert(Song song) {
         ContentValues values = new ContentValues();
         values.put(SongDatabaseHelper.ID_PROVIDER,song.getIdProvider());
         values.put(SongDatabaseHelper.SONG_NAME,song.getSongName());
@@ -44,14 +32,12 @@ public class FavoriteSongsProvider extends ContentProvider {
         mDatabase.insert(SongDatabaseHelper.ALL_SONGS_TABLE,null,values);
     }
 
-    public ArrayList<Song> listAllSongs()
-    {
+    public ArrayList<Song> listAllSongs() {
         ArrayList<Song> list = new ArrayList<>();
 
         String sql ="SELECT * FROM "+ SongDatabaseHelper.ALL_SONGS_TABLE;
         Cursor c = mDatabase.rawQuery(sql, null);
-        while (c.moveToNext())
-        {
+        while (c.moveToNext()) {
             int id = c.getInt(c.getColumnIndex(SongDatabaseHelper.SONG_ID));
             int idProvider = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID_PROVIDER));
             String songName = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_NAME));
@@ -67,8 +53,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         c.close();
         return list;
     }
-    public ArrayList<Song> searchSongByName(String s)
-    {
+    public ArrayList<Song> searchSongByName(String s) {
         ArrayList<Song> list = new ArrayList<>();
         String[] args = {"%"+s+"%"};
         Cursor c = mDatabase.query(SongDatabaseHelper.ALL_SONGS_TABLE, new String[]{
@@ -82,8 +67,7 @@ public class FavoriteSongsProvider extends ContentProvider {
                 SongDatabaseHelper.FAVORITE,
                 SongDatabaseHelper.COUNT_OF_PLAY
         },SongDatabaseHelper.SONG_NAME + " LIKE ?",args,null,null,null,null);
-        while (c.moveToNext())
-        {
+        while (c.moveToNext()) {
             int id = c.getInt(c.getColumnIndex(SongDatabaseHelper.SONG_ID));
             int idProvider = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID_PROVIDER));
             String songName = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_NAME));
@@ -106,8 +90,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         String sql ="SELECT * FROM "+ SongDatabaseHelper.ALL_SONGS_TABLE +" WHERE "+SongDatabaseHelper.FAVORITE+"=?";
         String[] args = {"2"};
         Cursor c = mDatabase.rawQuery(sql, args);
-        while (c.moveToNext())
-        {
+        while (c.moveToNext()) {
             int id = c.getInt(c.getColumnIndex(SongDatabaseHelper.SONG_ID));
             int idProvider = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID_PROVIDER));
             String songName = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_NAME));
@@ -129,8 +112,7 @@ public class FavoriteSongsProvider extends ContentProvider {
         String sql ="SELECT * FROM "+ SongDatabaseHelper.ALL_SONGS_TABLE +" WHERE "+SongDatabaseHelper.ID_PROVIDER+"=?";
         String[] args = {String.valueOf(idprovider)};
         Cursor c = mDatabase.rawQuery(sql, args);
-        while (c.moveToNext())
-        {
+        while (c.moveToNext()) {
             int id = c.getInt(c.getColumnIndex(SongDatabaseHelper.SONG_ID));
             int idProvider = c.getInt(c.getColumnIndex(SongDatabaseHelper.ID_PROVIDER));
             String songName = c.getString(c.getColumnIndex(SongDatabaseHelper.SONG_NAME));
@@ -147,8 +129,7 @@ public class FavoriteSongsProvider extends ContentProvider {
     }
 
 
-    public void update(Song song)
-    {
+    public void update(Song song) {
         ContentValues values = new ContentValues();
         values.put(SongDatabaseHelper.COUNT_OF_PLAY,song.getCountOfPlay());
         values.put(SongDatabaseHelper.FAVORITE,song.getIsFavorite());

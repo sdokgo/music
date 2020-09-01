@@ -24,10 +24,10 @@ public class StorageUtil {
         this.mContext = context;
     }
 
-    public void storeIsFavorite(boolean i){
+    public void storeIsFavorite(boolean isFavorite){
         mPreferences = mContext.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putBoolean(IS_FAVORITE,i);
+        editor.putBoolean(IS_FAVORITE,isFavorite);
         editor.apply();
     }
     public boolean loadIsFavorite(){
