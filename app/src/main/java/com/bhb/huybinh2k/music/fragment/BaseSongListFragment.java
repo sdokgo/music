@@ -18,10 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
-import com.bhb.huybinh2k.music.LogSetting;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.StorageUtil;
@@ -106,7 +104,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
         } else {
             update(mSongIndex);
             mRecyclerView.scrollToPosition(mSongIndex);
-            mAdapter.setmIOnClickSongListener(mIOnClickSongListener);
+            mAdapter.setIOnClickSongListener(mIOnClickSongListener);
         }
     }
 
@@ -120,10 +118,10 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
                 if (mList.get(position).getCountOfPlay() == MIN_COUNT_ADD_TO_FAVORITE &&
                         mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
                     mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
-                    mFavoriteSongsProvider.update(mList.get(position));
+                    mFavoriteSongsProvider.updateSongOfDB(mList.get(position));
                 }
                 mActivityMusic.playAudio(position, mList);
-                mActivityMusic.setmIsPlaying(true);
+                mActivityMusic.isPlaying = true;
                 update(position);
             }
         });
@@ -186,7 +184,7 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
     public void setmIOnClickSongListener(IOnClickSongListener iOnClickSongListener) {
         this.mIOnClickSongListener = iOnClickSongListener;
         if (mAdapter != null) {
-            mAdapter.setmIOnClickSongListener(iOnClickSongListener);
+            mAdapter.setIOnClickSongListener(iOnClickSongListener);
         }
     }
 }

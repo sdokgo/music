@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.LogSetting;
@@ -53,99 +54,72 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private static final String IS_PLAYING = "com.bhb.huybinh2k.IS_PLAYING";
     private static final String RESUME_POSITION = "com.bhb.huybinh2k.RESUME_POSITION";
     private static final String FAVORITE = "com.bhb.huybinh2k.FAVORITE";
-    IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
-    IUpdateAllSongsFragment mIUpdateAllSongsFragment;
-    private MediaPlaybackService mMediaService;
+    public MediaPlaybackService mediaService;
+    public int resumePosition;
+    public boolean isFavoriteFragment;
+    public boolean isPlaying;
+    public boolean isBack;
+    public boolean isServiceBound;
+    protected IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
+    protected IUpdateAllSongsFragment mIUpdateAllSongsFragment;
     private RelativeLayout mLayoutPlayBar;
     private ImageView mImagePause;
     private ImageView mImageSong;
     private TextView mTextViewSong;
     private TextView mTextViewSinger;
-    private int mResumePosition;
-    private boolean mFavorite;
-    private boolean mIsPlaying;
     /**
      * Nhận BroadcastReceiver
      */
-    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             int songIndex = intent.getIntExtra(GET_SONG_INDEX, DEFAULT_VALUE);
             int x = intent.getIntExtra(PLAY_PAUSE, DEFAULT_VALUE);
             if (x != DEFAULT_VALUE) {
                 if (x == PAUSE) {
-                    mIsPlaying = false;
+                    isPlaying = false;
                 } else {
-                    mIsPlaying = true;
+                    isPlaying = true;
                 }
                 playPauseReceiver();
             }
             if (songIndex != DEFAULT_VALUE) {
-                mIsPlaying = true;
+                isPlaying = true;
                 updateUIPlayBar(songIndex);
             }
-        }
-    };
-    private boolean mIsBack;
-    private boolean mServiceBound;
-    private int mOrientation;
-    public final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
-            mMediaService = binder.getService();
-            if (!mFavorite) {
-                mIUpdateAllSongsFragment.update(mMediaService.getmSongIndexService());
-            }
-            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mIUpdateMediaPlaybackFragment.update(mMediaService.getmSongIndexService());
-            }
-            if (!mMediaService.getmIsPlaying()) {
-                mImagePause.setImageResource(R.drawable.ic_play);
-                mIsPlaying = false;
-            } else {
-                mImagePause.setImageResource(R.drawable.ic_pause);
-                mIsPlaying = true;
-            }
-            mServiceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mServiceBound = false;
         }
     };
     private StorageUtil mStorageUtil;
     private androidx.appcompat.widget.Toolbar mToolbar;
     private MediaPlaybackFragment mMediaPlaybackFragment;
+    private int mOrientation;
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
+            mediaService = binder.getService();
+            if (!isFavoriteFragment) {
+                mIUpdateAllSongsFragment.update(mediaService.songIndexService);
+            }
+            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mIUpdateMediaPlaybackFragment.update(mediaService.songIndexService);
+            }
+            if (!mediaService.isPlaying) {
+                mImagePause.setImageResource(R.drawable.ic_play);
+                isPlaying = false;
+            } else {
+                mImagePause.setImageResource(R.drawable.ic_pause);
+                isPlaying = true;
+            }
+            isServiceBound = true;
+        }
 
-    public boolean getmFavorite() {
-        return mFavorite;
-    }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isServiceBound = false;
+        }
+    };
 
-    public MediaPlaybackService getmMediaService() {
-        return mMediaService;
-    }
-
-    public boolean getmIsPlaying() {
-        return mIsPlaying;
-    }
-
-    public void setmIsPlaying(boolean mIsPlaying) {
-        this.mIsPlaying = mIsPlaying;
-    }
-
-    public void setmIsBack(boolean mIsBack) {
-        this.mIsBack = mIsBack;
-    }
-
-    public int getmResumePosition() {
-        return mResumePosition;
-    }
-
-    public boolean isServiceBound() {
-        return mServiceBound;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,11 +138,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         setSupportActionBar(mToolbar);
 
         if (savedInstanceState != null) {
-            mIsPlaying = savedInstanceState.getBoolean(IS_PLAYING);
-            mResumePosition = savedInstanceState.getInt(RESUME_POSITION);
+            isPlaying = savedInstanceState.getBoolean(IS_PLAYING);
+            resumePosition = savedInstanceState.getInt(RESUME_POSITION);
             updateImagePlayPause();
-            mServiceBound = savedInstanceState.getBoolean(SERVICE_BOUND);
-            mFavorite = savedInstanceState.getBoolean(FAVORITE);
+            isServiceBound = savedInstanceState.getBoolean(SERVICE_BOUND);
+            isFavoriteFragment = savedInstanceState.getBoolean(FAVORITE);
         }
 
         checkOrentation();
@@ -177,7 +151,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         if (isMyServiceRunning(MediaPlaybackService.class)) {
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-            mServiceBound = true;
+            isServiceBound = true;
         }
     }
 
@@ -190,7 +164,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mOrientation = getResources().getConfiguration().orientation;
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            if (mFavorite) {
+            if (isFavoriteFragment) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_song,
                         new FavoriteSongsFragment()).commit();
             } else {
@@ -204,7 +178,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 }
             });
         } else {
-            if (mFavorite) {
+            if (isFavoriteFragment) {
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
                 favoriteSongsFragment.setmIOnClickSongListener(ActivityMusic.this);
                 getSupportFragmentManager().beginTransaction()
@@ -231,8 +205,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
-        mFavorite = mStorageUtil.loadIsFavorite();
-        if (mFavorite) {
+        isFavoriteFragment = mStorageUtil.loadIsFavorite();
+        if (isFavoriteFragment) {
             x = R.id.nav_favorite;
         } else {
             x = R.id.nav_all;
@@ -258,7 +232,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.frame_song, allSongsFragment)
                         .commit();
-                mFavorite = false;
+                isFavoriteFragment = false;
                 break;
             case R.id.nav_favorite:
                 FavoriteSongsFragment favoriteSongsFragment = new FavoriteSongsFragment();
@@ -266,11 +240,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.frame_song, favoriteSongsFragment)
                         .commit();
-                mFavorite = true;
+                isFavoriteFragment = true;
 
                 break;
         }
-        mStorageUtil.storeIsFavorite(mFavorite);
+        mStorageUtil.storeIsFavorite(isFavoriteFragment);
     }
 
     /**
@@ -279,13 +253,13 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public void playAudio(int songIndex, List<Song> list) {
         mStorageUtil.storeListSongPlaying(list);
         mStorageUtil.storeSongIndex(songIndex);
-        if (!mServiceBound) {
+        if (!isServiceBound) {
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
             startService(playerIntent);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
-            mMediaService.updateListSong(list);
-            mMediaService.playNewSong();
+            mediaService.updateListSong(list);
+            mediaService.playNewSong();
         }
     }
 
@@ -293,12 +267,12 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật image play/pause khi nhận đc receiver
      */
     private void playPauseReceiver() {
-        if (mIsPlaying) {
+        if (isPlaying) {
             mImagePause.setImageResource(R.drawable.ic_play);
-            mIsPlaying = false;
+            isPlaying = false;
         } else {
             mImagePause.setImageResource(R.drawable.ic_pause);
-            mIsPlaying = true;
+            isPlaying = true;
         }
     }
 
@@ -306,7 +280,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * cập nhật image play/pause
      */
     public void updateImagePlayPause() {
-        if (!mIsPlaying) {
+        if (!isPlaying) {
             mImagePause.setImageResource(R.drawable.ic_play);
         } else {
             mImagePause.setImageResource(R.drawable.ic_pause);
@@ -331,17 +305,17 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * Sự kiện khi click nào play/pause
      */
     private void clickPlayPause() {
-        if (mIsPlaying) {
-            mMediaService.pauseMedia();
+        if (isPlaying) {
+            mediaService.pauseMedia();
             mImagePause.setImageResource(R.drawable.ic_play);
-            mMediaService.buildNotification(PlaybackStatus.PAUSE);
-            mResumePosition = mMediaService.getmMediaPlayer().getCurrentPosition();
-            mIsPlaying = false;
+            mediaService.buildNotification(PlaybackStatus.PAUSE);
+            resumePosition = mediaService.mediaPlayer.getCurrentPosition();
+            isPlaying = false;
         } else {
-            mMediaService.resumeMedia();
+            mediaService.resumeMedia();
             mImagePause.setImageResource(R.drawable.ic_pause);
-            mMediaService.buildNotification(PlaybackStatus.PLAYING);
-            mIsPlaying = true;
+            mediaService.buildNotification(PlaybackStatus.PLAYING);
+            isPlaying = true;
         }
     }
 
@@ -372,9 +346,9 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Log.d(TAG, "onDestroyActivity");
         }
         if (isFinishing()) {
-            if (!mIsPlaying) {
+            if (!isPlaying) {
                 unbindService(mServiceConnection);
-                mMediaService.stopSelf();
+                mediaService.stopSelf();
                 mStorageUtil.storeSongIndex(DEFAULT_VALUE);
                 mStorageUtil.storeIsFavorite(false);
             }
@@ -389,27 +363,27 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Log.d(TAG, "BackPressed");
         }
         super.onBackPressed();
-        if (!mIsBack) {
-            if (mServiceBound) {
-                if (!mIsPlaying) {
+        if (!isBack) {
+            if (isServiceBound) {
+                if (!isPlaying) {
                     unbindService(mServiceConnection);
-                    mMediaService.stopSelf();
+                    mediaService.stopSelf();
                     mStorageUtil.storeSongIndex(DEFAULT_VALUE);
                     mStorageUtil.storeIsFavorite(false);
                 }
             }
         }
-        mIsBack = false;
+        isBack = false;
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(SERVICE_BOUND, mServiceBound);
-        outState.putBoolean(IS_PLAYING, mIsPlaying);
-        outState.putBoolean(FAVORITE, mFavorite);
-        if (mServiceBound) {
-            outState.putInt(RESUME_POSITION, mMediaService.getmMediaPlayer().getCurrentPosition());
+        outState.putBoolean(SERVICE_BOUND, isServiceBound);
+        outState.putBoolean(IS_PLAYING, isPlaying);
+        outState.putBoolean(FAVORITE, isFavoriteFragment);
+        if (isServiceBound) {
+            outState.putInt(RESUME_POSITION, mediaService.mediaPlayer.getCurrentPosition());
         }
 
     }

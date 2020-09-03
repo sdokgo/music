@@ -129,7 +129,7 @@ public class FavoriteSongsProvider extends ContentProvider {
     }
 
 
-    public void update(Song song) {
+    public void updateSongOfDB(Song song) {
         ContentValues values = new ContentValues();
         values.put(SongDatabaseHelper.COUNT_OF_PLAY,song.getCountOfPlay());
         values.put(SongDatabaseHelper.FAVORITE,song.getIsFavorite());

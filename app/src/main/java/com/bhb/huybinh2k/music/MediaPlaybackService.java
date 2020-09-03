@@ -49,10 +49,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private static final int PLAY_SONG = 2;
     private static final int PAUSE_SONG = 3;
     private final IBinder mIBinder = new LocalBinder();
-    private MediaPlayer mMediaPlayer;
+    public MediaPlayer mediaPlayer;
+    public boolean isPlaying;
+    public int songIndexService;
     private List<Song> mSongListService;
-    private boolean mIsPlaying;
-    private int mSongIndexService;
     private Song mActiveSongService;
     private MediaSessionManager mMediaSessionManager;
     private MediaSessionCompat mMediaSession;
@@ -60,18 +60,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private int mShuffle;
     private int mRepeat;
     private int mResumePosition;
-
-    public MediaPlayer getmMediaPlayer() {
-        return mMediaPlayer;
-    }
-
-    public boolean getmIsPlaying() {
-        return mIsPlaying;
-    }
-
-    public int getmSongIndexService() {
-        return mSongIndexService;
-    }
 
     /**
      * Cập nhật trạng thái của shuffle và repeat
@@ -91,23 +79,23 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         createNotificationChannel();
         StorageUtil mStorageUtil = new StorageUtil(getApplicationContext());
         mSongListService = mStorageUtil.loadListSongPlaying();
-        mSongIndexService = mStorageUtil.loadSongIndex();
+        songIndexService = mStorageUtil.loadSongIndex();
         mShuffle = mStorageUtil.loadShuffle();
         mRepeat = mStorageUtil.loadRepeat();
-        if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
-            mActiveSongService = mSongListService.get(mSongIndexService);
+        if (songIndexService != ActivityMusic.DEFAULT_VALUE && songIndexService < mSongListService.size()) {
+            mActiveSongService = mSongListService.get(songIndexService);
         } else {
             stopSelf();
-            mIsPlaying = false;
+            isPlaying = false;
         }
 
         stopSelf();
-        mIsPlaying = false;
+        isPlaying = false;
         if (mMediaSessionManager == null) {
             initMediaSession();
             initMediaPlayer();
             buildNotification(PlaybackStatus.PLAYING);
-            mIsPlaying = true;
+            isPlaying = true;
 
         }
 
@@ -120,18 +108,18 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * Phát bài hát mới
      */
     public void playNewSong() {
-        mSongIndexService = new StorageUtil(getApplicationContext()).loadSongIndex();
-        if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
-            mActiveSongService = mSongListService.get(mSongIndexService);
+        songIndexService = new StorageUtil(getApplicationContext()).loadSongIndex();
+        if (songIndexService != ActivityMusic.DEFAULT_VALUE && songIndexService < mSongListService.size()) {
+            mActiveSongService = mSongListService.get(songIndexService);
         } else {
             stopSelf();
         }
         stopMedia();
-        mMediaPlayer.reset();
+        mediaPlayer.reset();
         initMediaPlayer();
         updateMetaData();
         buildNotification(PlaybackStatus.PLAYING);
-        mIsPlaying = true;
+        isPlaying = true;
     }
 
     /**
@@ -154,7 +142,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 resumeMedia();
                 sendBroadcast(PLAY_SONG);
                 buildNotification(PlaybackStatus.PLAYING);
-                mIsPlaying = true;
+                isPlaying = true;
 
             }
 
@@ -165,7 +153,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 sendBroadcast(PAUSE_SONG);
                 buildNotification(PlaybackStatus.PAUSE);
                 stopForeground(false);
-                mIsPlaying = false;
+                isPlaying = false;
             }
 
             @Override
@@ -175,7 +163,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 updateMetaData();
                 sendBroadcast(SONG_CHANGE);
                 buildNotification(PlaybackStatus.PLAYING);
-                mIsPlaying = true;
+                isPlaying = true;
             }
 
             @Override
@@ -185,7 +173,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
                 updateMetaData();
                 sendBroadcast(SONG_CHANGE);
                 buildNotification(PlaybackStatus.PLAYING);
-                mIsPlaying = true;
+                isPlaying = true;
             }
 
             @Override
@@ -210,7 +198,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         intent.setAction(ActivityMusic.BROADCAST_RECEIVER);
         switch (x) {
             case SONG_CHANGE:
-                intent.putExtra(ActivityMusic.GET_SONG_INDEX, mSongIndexService);
+                intent.putExtra(ActivityMusic.GET_SONG_INDEX, songIndexService);
                 sendBroadcast(intent);
                 break;
             case PLAY_SONG:
@@ -228,29 +216,29 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * Khởi tạo MediaPlayer
      */
     private void initMediaPlayer() {
-        mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setOnCompletionListener(this);
-        mMediaPlayer.setOnPreparedListener(this);
-        mMediaPlayer.reset();
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.reset();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            mMediaPlayer.setDataSource(mActiveSongService.getSongPath());
+            mediaPlayer.setDataSource(mActiveSongService.getSongPath());
         } catch (IOException e) {
             // setDataSource bat buoc co try catch IOException
             e.printStackTrace();
             stopSelf();
         }
-        mMediaPlayer.prepareAsync();
-        mIsPlaying = true;
+        mediaPlayer.prepareAsync();
+        isPlaying = true;
     }
 
     /**
      * Phát bài hát
      */
     private void playMedia() {
-        if (!mMediaPlayer.isPlaying()) {
-            mMediaPlayer.start();
-            mIsPlaying = true;
+        if (!mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+            isPlaying = true;
         }
     }
 
@@ -258,10 +246,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * Stop bài hát
      */
     private void stopMedia() {
-        if (mMediaPlayer == null) return;
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.stop();
-            mIsPlaying = false;
+        if (mediaPlayer == null) return;
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+            isPlaying = false;
         }
     }
 
@@ -269,10 +257,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * Tạm dừng bài hát
      */
     public void pauseMedia() {
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
-            mResumePosition = mMediaPlayer.getCurrentPosition();
-            mIsPlaying = false;
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            mResumePosition = mediaPlayer.getCurrentPosition();
+            isPlaying = false;
         }
     }
 
@@ -280,10 +268,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * Tiếp tục phát bài hát
      */
     public void resumeMedia() {
-        if (!mMediaPlayer.isPlaying()) {
-            mMediaPlayer.seekTo(mResumePosition);
-            mMediaPlayer.start();
-            mIsPlaying = true;
+        if (!mediaPlayer.isPlaying()) {
+            mediaPlayer.seekTo(mResumePosition);
+            mediaPlayer.start();
+            isPlaying = true;
         }
     }
 
@@ -294,7 +282,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         //Nếu chọn repeat chỉ 1 bài hát thì chạy lại bài hát vừa kết thúc
         if (mRepeat == MediaPlaybackFragment.REPEAT_ONE) {
             stopMedia();
-            mMediaPlayer.reset();
+            mediaPlayer.reset();
             initMediaPlayer();
             updateMetaData();
 
@@ -305,14 +293,14 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } else if (mShuffle == MediaPlaybackFragment.SHUFFLE) {
             Random random = new Random();
             int r = random.nextInt(mSongListService.size());
-            while (r == mSongIndexService) {
+            while (r == songIndexService) {
                 r = random.nextInt(mSongListService.size());
             }
             stopMedia();
-            mSongIndexService = r;
-            mActiveSongService = mSongListService.get(mSongIndexService);
-            new StorageUtil(getApplicationContext()).storeSongIndex(mSongIndexService);
-            mMediaPlayer.reset();
+            songIndexService = r;
+            mActiveSongService = mSongListService.get(songIndexService);
+            new StorageUtil(getApplicationContext()).storeSongIndex(songIndexService);
+            mediaPlayer.reset();
             initMediaPlayer();
             updateMetaData();
 
@@ -337,10 +325,10 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * phát bài đang phát đến vị trí được chọn
      */
     public void seekTo(int x) {
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
-            mMediaPlayer.seekTo(x);
-            mMediaPlayer.start();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            mediaPlayer.seekTo(x);
+            mediaPlayer.start();
         } else {
             mResumePosition = x;
         }
@@ -350,15 +338,15 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * phát bài hát tiếp theo
      */
     public void skipToNext() {
-        if (mSongIndexService == mSongListService.size() - 1) {
-            mSongIndexService = 0;
-            mActiveSongService = mSongListService.get(mSongIndexService);
+        if (songIndexService == mSongListService.size() - 1) {
+            songIndexService = 0;
+            mActiveSongService = mSongListService.get(songIndexService);
         } else {
-            mActiveSongService = mSongListService.get(++mSongIndexService);
+            mActiveSongService = mSongListService.get(++songIndexService);
         }
-        new StorageUtil(getApplicationContext()).storeSongIndex(mSongIndexService);
+        new StorageUtil(getApplicationContext()).storeSongIndex(songIndexService);
         stopMedia();
-        mMediaPlayer.reset();
+        mediaPlayer.reset();
         initMediaPlayer();
     }
 
@@ -366,15 +354,15 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
      * phát bài hát trước đó
      */
     public void skipToPrevious() {
-        if (mSongIndexService == 0) {
-            mSongIndexService = mSongListService.size() - 1;
-            mActiveSongService = mSongListService.get(mSongIndexService);
+        if (songIndexService == 0) {
+            songIndexService = mSongListService.size() - 1;
+            mActiveSongService = mSongListService.get(songIndexService);
         } else {
-            mActiveSongService = mSongListService.get(--mSongIndexService);
+            mActiveSongService = mSongListService.get(--songIndexService);
         }
-        new StorageUtil(getApplicationContext()).storeSongIndex(mSongIndexService);
+        new StorageUtil(getApplicationContext()).storeSongIndex(songIndexService);
         stopMedia();
-        mMediaPlayer.reset();
+        mediaPlayer.reset();
         initMediaPlayer();
     }
 
@@ -503,9 +491,9 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mMediaPlayer != null) {
+        if (mediaPlayer != null) {
             stopMedia();
-            mMediaPlayer.release();
+            mediaPlayer.release();
         }
     }
 

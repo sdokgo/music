@@ -1,5 +1,6 @@
 package com.bhb.huybinh2k.music.fragment;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
+import com.bhb.huybinh2k.music.activity.ActivityMusic;
 import com.bhb.huybinh2k.music.adapter.SongsAdapter;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 
@@ -22,8 +24,6 @@ import java.util.List;
 
 public class SearchFragment extends BaseSongListFragment {
     private SearchView mSearchView;
-    private List<Song> mListAllSong;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
@@ -34,8 +34,6 @@ public class SearchFragment extends BaseSongListFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mListAllSong = mFavoriteSongsProvider.listAllSongs();
-
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -61,37 +59,31 @@ public class SearchFragment extends BaseSongListFragment {
         mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int position) {
-                int index = mList.get(position).getId() - 1; //todo
-                mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);
                 if (mList.get(position).getCountOfPlay() == MIN_COUNT_ADD_TO_FAVORITE &&
                         mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
                     mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
-                    mFavoriteSongsProvider.update(mList.get(position));
+                    mFavoriteSongsProvider.updateSongOfDB(mList.get(position));
                 }
-                mActivityMusic.playAudio(index, mListAllSong);
-                mActivityMusic.setmIsPlaying(true);
-                getFragmentManager().popBackStack();
-                if (mActivityMusic.getmFavorite()) {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_song, new AllSongsFragment())
-                            .commit();
-                }
-//                updateUI(index);
+                mActivityMusic.playAudio(position, mList);
+                mActivityMusic.isPlaying = true;
+                update(position);
             }
         });
     }
 
-    //    public void updateUI(int songIndex) {
-//        mAdapter.setmPlayingIdProvider(listSerach.get(songIndex).getIdProvider());
-//        mAdapter.notifyDataSetChanged();
-//        mRecyclerView.scrollToPosition(songIndex);
-//        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-//            if (mSongIndex != -1) {
-//                mPlayBar.setVisibility(View.VISIBLE);
-//                mActivityMusic.updateUIPlayBar(songIndex);
-//            }
-//        }
-//    }
+    public void update(int songIndex) {
+        if (!mList.isEmpty()){
+            mAdapter.setmPlayingIdProvider(mList.get(songIndex).getIdProvider());
+        }
+        mAdapter.notifyDataSetChanged();
+        mRecyclerView.scrollToPosition(songIndex);
+        if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (mSongIndex != ActivityMusic.DEFAULT_VALUE) {
+                mPlayBar.setVisibility(View.VISIBLE);
+                mActivityMusic.updateUIPlayBar(songIndex);
+            }
+        }
+    }
 }

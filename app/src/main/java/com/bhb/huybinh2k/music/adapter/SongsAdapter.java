@@ -48,7 +48,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    public void setmIOnClickSongListener(IOnClickSongListener mIOnClickSongListener) {
+    public void setIOnClickSongListener(IOnClickSongListener mIOnClickSongListener) {
         this.mIOnClickSongListener = mIOnClickSongListener;
     }
 
@@ -59,18 +59,6 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final Song song = mList.get(position);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onItemClick(holder.itemView, position);
-                    if (mIOnClickSongListener != null) {
-                        mIOnClickSongListener.update(position);
-                    }
-                }
-            }
-        });
-
         if (song.getIdProvider() == mPlayingIdProvider) {
             holder.id.setVisibility(View.INVISIBLE);
             holder.songName.setTypeface(Typeface.DEFAULT_BOLD);
@@ -104,7 +92,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                 public boolean onMenuItemClick(MenuItem item) {
                     if (item.getItemId() == R.id.removeFromFavorite) {
                         song.setIsFavorite(MediaPlaybackFragment.DEFAULT_FAVORITE);
-                        new FavoriteSongsProvider(mContext).update(song);
+                        new FavoriteSongsProvider(mContext).updateSongOfDB(song);
                         mList.remove(song);
                         notifyDataSetChanged();
                         Toast.makeText(mContext, R.string.remove_succes, Toast.LENGTH_SHORT).show();
@@ -119,7 +107,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                 public boolean onMenuItemClick(MenuItem item) {
                     if (item.getItemId() == R.id.addToFavorite) {
                         song.setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
-                        new FavoriteSongsProvider(mContext).update(song);
+                        new FavoriteSongsProvider(mContext).updateSongOfDB(song);
                         Toast.makeText(mContext, R.string.add_succes, Toast.LENGTH_SHORT).show();
                     }
                     return false;
@@ -139,7 +127,7 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
         void onItemClick(View itemView, int position);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView id;
         private TextView songName;
@@ -154,6 +142,17 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
             time = itemView.findViewById(R.id.thoigian);
             imageId = itemView.findViewById(R.id.imgstt);
             imageView = itemView.findViewById(R.id.threedot);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        mListener.onItemClick(itemView, getLayoutPosition());
+                        if (mIOnClickSongListener != null) {
+                            mIOnClickSongListener.update(getLayoutPosition());
+                        }
+                    }
+                }
+            });
         }
     }
 

@@ -38,7 +38,7 @@ public class FavoriteSongsFragment extends BaseSongListFragment {
         int index = new StorageUtil(getContext()).loadSongIndex();
         List<Song> listPlaying = new StorageUtil(getContext()).loadListSongPlaying();
         if (listPlaying != null) {
-            if (mActivityMusic.getmFavorite() && listPlaying.size() != mFavoriteSongsProvider.listFavorite().size()) {
+            if (mActivityMusic.isFavoriteFragment && listPlaying.size() != mFavoriteSongsProvider.listFavorite().size()) {
                 mList = mFavoriteSongsProvider.listFavorite();
             }
         }
