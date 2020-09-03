@@ -65,12 +65,11 @@ public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.ViewHolder> 
                 if (mListener != null) {
                     mListener.onItemClick(holder.itemView, position);
                     if (mIOnClickSongListener != null) {
-                        mIOnClickSongListener.update(song.getId() - 1);
+                        mIOnClickSongListener.update(position);
                     }
                 }
             }
         });
-
 
         if (song.getIdProvider() == mPlayingIdProvider) {
             holder.id.setVisibility(View.INVISIBLE);

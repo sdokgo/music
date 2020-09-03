@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.IOnClickSongListener;
 import com.bhb.huybinh2k.music.LogSetting;
@@ -33,7 +34,7 @@ import java.util.List;
 
 public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpdateAllSongsFragment {
     public static final String SONG_INDEX = "com.bhb.huybinh2k.SONG_INDEX";
-    private static final int MIN_COUNT_ADD_TO_FAVORITE = 3 ;
+    protected static final int MIN_COUNT_ADD_TO_FAVORITE = 3 ;
     protected List<Song> mList = new ArrayList<>();
     protected RecyclerView mRecyclerView;
     protected ActivityMusic mActivityMusic;

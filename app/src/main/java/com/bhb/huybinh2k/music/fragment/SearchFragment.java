@@ -65,7 +65,7 @@ public class SearchFragment extends BaseSongListFragment {
                 mSongIndex = position;
                 int countOfPlay = mList.get(position).getCountOfPlay();
                 mList.get(position).setCountOfPlay(++countOfPlay);
-                if (mList.get(position).getCountOfPlay() == 3 &&
+                if (mList.get(position).getCountOfPlay() == MIN_COUNT_ADD_TO_FAVORITE &&
                         mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
                     mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
                     mFavoriteSongsProvider.update(mList.get(position));

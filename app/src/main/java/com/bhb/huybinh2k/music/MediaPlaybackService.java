@@ -88,25 +88,21 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        try {
-
-            createNotificationChannel();
-            StorageUtil mStorageUtil = new StorageUtil(getApplicationContext());
-            mSongListService = mStorageUtil.loadListSongPlaying();
-            mSongIndexService = mStorageUtil.loadSongIndex();
-            mShuffle = mStorageUtil.loadShuffle();
-            mRepeat = mStorageUtil.loadRepeat();
-            if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
-                mActiveSongService = mSongListService.get(mSongIndexService);
-            } else {
-                stopSelf();
-                mIsPlaying = false;
-            }
-
-//        } catch (NullPointerException e) {
+        createNotificationChannel();
+        StorageUtil mStorageUtil = new StorageUtil(getApplicationContext());
+        mSongListService = mStorageUtil.loadListSongPlaying();
+        mSongIndexService = mStorageUtil.loadSongIndex();
+        mShuffle = mStorageUtil.loadShuffle();
+        mRepeat = mStorageUtil.loadRepeat();
+        if (mSongIndexService != ActivityMusic.DEFAULT_VALUE && mSongIndexService < mSongListService.size()) {
+            mActiveSongService = mSongListService.get(mSongIndexService);
+        } else {
             stopSelf();
             mIsPlaying = false;
-//        }
+        }
+
+        stopSelf();
+        mIsPlaying = false;
         if (mMediaSessionManager == null) {
             initMediaSession();
             initMediaPlayer();
@@ -141,6 +137,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     /**
      * Khởi tạo MediaSession
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initMediaSession() {
         if (mMediaSessionManager != null) return;
         mMediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);

@@ -452,6 +452,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Bundle bundle = new Bundle();
             bundle.putInt(AllSongsFragment.SONG_INDEX, index);
             mMediaPlaybackFragment.update(bundle);
+            mMediaPlaybackFragment.disableOrEnableClick(true);
+            mMediaPlaybackFragment.changeSeekBar();
         }
     }
 
