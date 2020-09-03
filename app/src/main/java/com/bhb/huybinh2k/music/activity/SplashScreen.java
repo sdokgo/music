@@ -1,7 +1,9 @@
 package com.bhb.huybinh2k.music.activity;
 
+import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -9,10 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.bhb.huybinh2k.music.MediaPlaybackService;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
 import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
@@ -20,21 +20,8 @@ import com.bhb.huybinh2k.music.database.FavoriteSongsProvider;
 public class SplashScreen extends AppCompatActivity {
 
     private static final int REQUEST_CODE = 113;
-    private static final String ALBUM_ART ="content://media/external/audio/albumart" ;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash_screen);
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        checkPermision();
-    }
-
+    private static final String ALBUM_ART = "content://media/external/audio/albumart";
+    boolean checkPermision;
     Runnable mWait1s = new Runnable() {
         @Override
         public void run() {
@@ -49,6 +36,30 @@ public class SplashScreen extends AppCompatActivity {
         }
     };
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.splash_screen);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isMyServiceRunning(MediaPlaybackService.class)) {
+            Intent intent = new Intent(SplashScreen.this, ActivityMusic.class);
+            startActivity(intent);
+            finish();
+        } else {
+            checkPermision();
+            if (checkPermision) {
+                getSongList();
+                Thread thread = new Thread(mWait1s);
+                thread.start();
+            }
+        }
+    }
+
     private void checkPermision() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -56,9 +67,7 @@ public class SplashScreen extends AppCompatActivity {
                 requestPermissions(new String[]{
                         android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
             } else {
-                getSongList();
-                Thread thread = new Thread(mWait1s);
-                thread.start();
+                checkPermision = true;
             }
         }
     }
@@ -101,12 +110,22 @@ public class SplashScreen extends AppCompatActivity {
                 }
                 while (musicCursor.moveToNext());
             }
+            musicCursor.close();
         }
-        musicCursor.close();
+
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    /**
+     * check xem service có đang chạy hay ko
+     */
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
+
 }

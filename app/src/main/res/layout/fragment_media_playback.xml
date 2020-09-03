@@ -6,19 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MediaPlaybackFragment">
 
-    <FrameLayout
+
+    <ImageView
+        android:id="@+id/img_song"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/seekbar"
+        android:scaleType="fitXY"
+        android:src="@drawable/music" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/seek_bar"
         android:layout_below="@id/header"
         android:layout_centerVertical="true">
-
-        <ImageView
-            android:id="@+id/img_song"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/music" />
 
         <ImageView
             android:id="@+id/repeat"
@@ -41,98 +42,114 @@
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_margin="@dimen/dimen_10dp">
+        android:layout_height="74dp"
+        android:background="@color/background_white">
 
-        <ImageView
-            android:id="@+id/img_header"
-            android:layout_width="@dimen/dimen_64dp"
-            android:layout_height="@dimen/dimen_64dp"
-            android:src="@drawable/music" />
-
-        <ImageView
-            android:id="@+id/playlist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/dimen_15dp"
-            android:layout_toStartOf="@id/more"
-            android:src="@drawable/ic_queue_music" />
-
-        <ImageView
-            android:id="@+id/more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_threedot" />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/dimen_10dp"
-            android:layout_toStartOf="@id/playlist"
-            android:layout_toEndOf="@id/img_header"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/dimen_10dp">
 
-            <TextView
-                android:id="@+id/tenbaihat_media"
+            <ImageView
+                android:id="@+id/img_header"
+                android:layout_width="@dimen/dimen_64dp"
+                android:layout_height="@dimen/dimen_64dp"
+                android:src="@drawable/music" />
+
+            <ImageView
+                android:id="@+id/playlist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_5dp"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="@dimen/dimen_18sp"
-                android:textStyle="normal" />
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/dimen_15dp"
+                android:layout_toStartOf="@id/more"
+                android:src="@drawable/ic_queue_music" />
 
-            <TextView
-                android:id="@+id/tencasi_media"
+            <ImageView
+                android:id="@+id/more"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:singleLine="true"
-                android:textSize="@dimen/dimen_14sp" />
-        </LinearLayout>
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_threedot" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/dimen_10dp"
+                android:layout_toStartOf="@id/playlist"
+                android:layout_toEndOf="@id/img_header"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tenbaihat_media"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_5dp"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textSize="@dimen/dimen_18sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/tencasi_media"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:textSize="@dimen/dimen_14sp" />
+            </LinearLayout>
+        </RelativeLayout>
+
+
     </RelativeLayout>
 
     <SeekBar
-        android:id="@+id/seekbar"
+        android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/timeOfSeekbar" />
+        android:layout_above="@id/frame_control"
+        android:background="@color/background_white"
+        android:paddingStart="@dimen/dimen_2dp"
+        android:paddingEnd="@dimen/dimen_2dp"
+        android:progressBackgroundTint="#000000"
+        android:progressTint="@color/colorOrange"
+        android:thumbTint="@color/colorOrange" />
 
-    <RelativeLayout
-        android:id="@+id/timeOfSeekbar"
+    <FrameLayout
+        android:id="@+id/frame_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/control_song"
-        android:layout_marginBottom="-8dp">
+        android:layout_alignParentBottom="true"
+        android:background="@color/background_white">
 
-        <TextView
-            android:id="@+id/runtime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/dimen_10dp"
-            android:textSize="@dimen/dimen_14sp" />
+        <RelativeLayout
+            android:id="@+id/timeOfSeekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/song_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/dimen_10dp"
-            android:textSize="@dimen/dimen_14sp" />
+            <TextView
+                android:id="@+id/runtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/dimen_10dp"
+                android:textSize="@dimen/dimen_14sp" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/song_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/dimen_10dp"
+                android:textSize="@dimen/dimen_14sp" />
 
-
+        </RelativeLayout>
 
         <LinearLayout
-            android:layout_alignParentBottom="true"
             android:id="@+id/control_song"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -182,5 +199,7 @@
                 android:layout_weight="1"
                 android:src="@drawable/ic_thumbs_down_default" />
         </LinearLayout>
+    </FrameLayout>
+
 
 </RelativeLayout>

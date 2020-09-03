@@ -60,13 +60,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public boolean isPlaying;
     public boolean isBack;
     public boolean isServiceBound;
-    protected IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
-    protected IUpdateAllSongsFragment mIUpdateAllSongsFragment;
+    private IUpdateMediaPlaybackFragment mIUpdateMediaPlaybackFragment;
+    private IUpdateAllSongsFragment mIUpdateAllSongsFragment;
     private RelativeLayout mLayoutPlayBar;
     private ImageView mImagePause;
     private ImageView mImageSong;
     private TextView mTextViewSong;
     private TextView mTextViewSinger;
+    public DrawerLayout drawerLayout;
     /**
      * Nhận BroadcastReceiver
      */
@@ -120,7 +121,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
     };
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,6 +136,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         mTextViewSinger = findViewById(R.id.tencasi_playbar);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+        isFavoriteFragment = mStorageUtil.loadIsFavorite();
 
         if (savedInstanceState != null) {
             isPlaying = savedInstanceState.getBoolean(IS_PLAYING);
@@ -200,12 +201,11 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
      * add Navigation
      */
     private void addNavigation() {
-        final DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, mToolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         int x;
-        isFavoriteFragment = mStorageUtil.loadIsFavorite();
         if (isFavoriteFragment) {
             x = R.id.nav_favorite;
         } else {
@@ -346,15 +346,13 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Log.d(TAG, "onDestroyActivity");
         }
         if (isFinishing()) {
-            if (!isPlaying) {
+            if (!isPlaying && isServiceBound) {
                 unbindService(mServiceConnection);
                 mediaService.stopSelf();
                 mStorageUtil.storeSongIndex(DEFAULT_VALUE);
                 mStorageUtil.storeIsFavorite(false);
             }
         }
-
-
     }
 
     @Override
@@ -364,14 +362,13 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         }
         super.onBackPressed();
         if (!isBack) {
-            if (isServiceBound) {
-                if (!isPlaying) {
-                    unbindService(mServiceConnection);
-                    mediaService.stopSelf();
-                    mStorageUtil.storeSongIndex(DEFAULT_VALUE);
-                    mStorageUtil.storeIsFavorite(false);
-                }
+            if (!isPlaying && isServiceBound) {
+                unbindService(mServiceConnection);
+                mediaService.stopSelf();
+                mStorageUtil.storeSongIndex(DEFAULT_VALUE);
+                mStorageUtil.storeIsFavorite(false);
             }
+
         }
         isBack = false;
     }
@@ -420,6 +417,10 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         return false;
     }
 
+    /**
+     * @param index
+     * Cập nhật dữ liệu MediaPlayBackFragment khi màn hình xoay ngang
+     */
     @Override
     public void update(int index) {
         if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {

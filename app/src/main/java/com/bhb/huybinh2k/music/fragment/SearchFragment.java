@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +34,12 @@ public class SearchFragment extends BaseSongListFragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mActivityMusic.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -55,22 +62,7 @@ public class SearchFragment extends BaseSongListFragment {
         mAdapter = new SongsAdapter(getContext(), mList, false);
         super.onViewCreated(view, savedInstanceState);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-
-        mAdapter.setOnItemClickListener(new SongsAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View itemView, int position) {
-                int countOfPlay = mList.get(position).getCountOfPlay();
-                mList.get(position).setCountOfPlay(++countOfPlay);
-                if (mList.get(position).getCountOfPlay() == MIN_COUNT_ADD_TO_FAVORITE &&
-                        mList.get(position).getIsFavorite() == MediaPlaybackFragment.DEFAULT_FAVORITE) {
-                    mList.get(position).setIsFavorite(MediaPlaybackFragment.SET_FAVORITE);
-                    mFavoriteSongsProvider.updateSongOfDB(mList.get(position));
-                }
-                mActivityMusic.playAudio(position, mList);
-                mActivityMusic.isPlaying = true;
-                update(position);
-            }
-        });
+        clickSong();
     }
 
     public void update(int songIndex) {
@@ -85,5 +77,11 @@ public class SearchFragment extends BaseSongListFragment {
                 mActivityMusic.updateUIPlayBar(songIndex);
             }
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mActivityMusic.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
     }
 }

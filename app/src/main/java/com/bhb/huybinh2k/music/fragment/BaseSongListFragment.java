@@ -99,7 +99,6 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
             if (mReplace) {
                 if (mSongIndex != ActivityMusic.DEFAULT_VALUE) update(mSongIndex);
                 mReplace = false;
-                mList = new StorageUtil(getContext()).loadListSongPlaying();
             }
         } else {
             update(mSongIndex);

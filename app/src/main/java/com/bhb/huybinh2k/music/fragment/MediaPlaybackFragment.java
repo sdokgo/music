@@ -119,8 +119,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageDislike = view.findViewById(R.id.dislike);
         mRunTime = view.findViewById(R.id.runtime);
         mDuration = view.findViewById(R.id.song_duration);
-        mSeekBar = view.findViewById(R.id.seekbar);
-        mSeekBar.setPadding(2, 0, 2, 0);
+        mSeekBar = view.findViewById(R.id.seek_bar);
         mImageShuffle = view.findViewById(R.id.shuffle);
         mImageRepeat = view.findViewById(R.id.repeat);
         mLayoutPlayBar = getActivity().findViewById(R.id.layoutPlayBar);

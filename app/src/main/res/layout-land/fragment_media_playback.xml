@@ -5,18 +5,20 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MediaPlaybackFragment">
 
+
+    <ImageView
+        android:scaleType="fitXY"
+        android:id="@+id/img_song"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/music"/>
+
     <FrameLayout
-        android:layout_above="@id/seekbar"
+        android:layout_above="@id/seek_bar"
         android:layout_below="@id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:scaleType="fitXY"
-            android:id="@+id/img_song"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/music"/>
 
         <ImageView
             android:layout_margin="@dimen/dimen_10dp"
@@ -35,7 +37,7 @@
     </FrameLayout>
 
     <RelativeLayout
-        android:background="#D5ECE8E8"
+        android:background="@color/background_white"
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_64dp">
@@ -97,7 +99,7 @@
 
 
     <RelativeLayout
-        android:background="#D5ECE8E8"
+        android:background="@color/background_white"
         android:id="@+id/control_song"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -179,7 +181,13 @@
     </RelativeLayout>
 
     <SeekBar
-        android:id="@+id/seekbar"
+        android:background="@color/background_white"
+        android:progressBackgroundTint="#000000"
+        android:progressTint="@color/colorOrange"
+        android:thumbTint="@color/colorOrange"
+        android:paddingEnd="@dimen/dimen_2dp"
+        android:paddingStart="@dimen/dimen_2dp"
+        android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/control_song" />

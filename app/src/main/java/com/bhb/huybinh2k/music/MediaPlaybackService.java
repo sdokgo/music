@@ -48,6 +48,8 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private static final int SONG_CHANGE = 1;
     private static final int PLAY_SONG = 2;
     private static final int PAUSE_SONG = 3;
+    private static final int REQUEST_CODE = 0;
+    private static final int FLAGS = 0;
     private final IBinder mIBinder = new LocalBinder();
     public MediaPlayer mediaPlayer;
     public boolean isPlaying;
@@ -88,9 +90,6 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             stopSelf();
             isPlaying = false;
         }
-
-        stopSelf();
-        isPlaying = false;
         if (mMediaSessionManager == null) {
             initMediaSession();
             initMediaPlayer();
@@ -113,6 +112,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
             mActiveSongService = mSongListService.get(songIndexService);
         } else {
             stopSelf();
+            return;
         }
         stopMedia();
         mediaPlayer.reset();
@@ -223,10 +223,11 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             mediaPlayer.setDataSource(mActiveSongService.getSongPath());
-        } catch (IOException e) {
             // setDataSource bat buoc co try catch IOException
+        } catch (IOException e) {
             e.printStackTrace();
             stopSelf();
+            return;
         }
         mediaPlayer.prepareAsync();
         isPlaying = true;
@@ -324,13 +325,13 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     /**
      * phát bài đang phát đến vị trí được chọn
      */
-    public void seekTo(int x) {
+    public void seekTo(int position) {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
-            mediaPlayer.seekTo(x);
+            mediaPlayer.seekTo(position);
             mediaPlayer.start();
         } else {
-            mResumePosition = x;
+            mResumePosition = position;
         }
     }
 
@@ -403,7 +404,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         stackBuilder.addNextIntentWithParentStack(resultIntent);
         // Get the PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                stackBuilder.getPendingIntent(REQUEST_CODE, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -453,16 +454,16 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         switch (actionNumber) {
             case PLAY:
                 playbackAction.setAction(ACTION_PLAY);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
+                return PendingIntent.getService(this, actionNumber, playbackAction, FLAGS);
             case PAUSE:
                 playbackAction.setAction(ACTION_PAUSE);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
+                return PendingIntent.getService(this, actionNumber, playbackAction, FLAGS);
             case NEXT:
                 playbackAction.setAction(ACTION_NEXT);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
+                return PendingIntent.getService(this, actionNumber, playbackAction, FLAGS);
             case PREVIOUS:
                 playbackAction.setAction(ACTION_PREVIOUS);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
+                return PendingIntent.getService(this, actionNumber, playbackAction, FLAGS);
             default:
                 break;
 
