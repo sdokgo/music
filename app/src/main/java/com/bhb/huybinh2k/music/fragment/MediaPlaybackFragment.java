@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bhb.huybinh2k.music.LogSetting;
+import com.bhb.huybinh2k.music.MediaPlaybackService;
 import com.bhb.huybinh2k.music.PlaybackStatus;
 import com.bhb.huybinh2k.music.R;
 import com.bhb.huybinh2k.music.Song;
@@ -120,9 +121,12 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mRunTime = view.findViewById(R.id.runtime);
         mDuration = view.findViewById(R.id.song_duration);
         mSeekBar = view.findViewById(R.id.seek_bar);
+        changeSeekBar();
         mImageShuffle = view.findViewById(R.id.shuffle);
         mImageRepeat = view.findViewById(R.id.repeat);
         mLayoutPlayBar = getActivity().findViewById(R.id.layoutPlayBar);
+        mListPlaying = mStorageUtil.loadListSongPlaying();
+        mSongIndex = mStorageUtil.loadSongIndex();
         mImageShuffle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -138,19 +142,49 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImageNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                skipToNext();
+                if (!mActivityMusic.isServiceBound) {
+                    if (mSongIndex == mListPlaying.size() - 1) {
+                        mSongIndex = 0;
+                    } else {
+                        ++mSongIndex;
+                    }
+                    mActivityMusic.playAudio(mSongIndex, mListPlaying);
+                    disableOrEnableClick(true);
+                    updateUI(mSongIndex);
+                } else {
+                    skipToNext();
+                }
             }
         });
         mImagePrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                skipToPrevious();
+                if (!mActivityMusic.isServiceBound) {
+                    if (mSongIndex == 0) {
+                        mSongIndex = mListPlaying.size() - 1;
+                    } else {
+                        --mSongIndex;
+                    }
+                    mActivityMusic.playAudio(mSongIndex, mListPlaying);
+                    disableOrEnableClick(true);
+                    updateUI(mSongIndex);
+                } else {
+                    skipToPrevious();
+                }
             }
         });
         mImagePause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                clickPlayPause();
+                if (!mActivityMusic.isServiceBound) {
+                    mActivityMusic.playAudio(mSongIndex, mListPlaying);
+                    disableOrEnableClick(true);
+                    changeSeekBar();
+                    updateUI(mSongIndex);
+                } else {
+                    clickPlayPause();
+                }
+
             }
         });
         mImageMore.setOnClickListener(new View.OnClickListener() {
@@ -188,21 +222,15 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         updateImageRepeatShuffle();
 
         if (!mActivityMusic.isServiceBound) {
-//            mListPlaying = mFavoriteSongsProvider.listAllSongs();
-//            if (!mListPlaying.isEmpty()) {
-//                mActivityMusic.playAudio(0, mListPlaying);
-//            } else {
-//                Toast.makeText(getContext(), R.string.no_music, Toast.LENGTH_SHORT).show();
-//            }
             disableOrEnableClick(false);
-        } else if (mSongIndex != ActivityMusic.DEFAULT_VALUE) {
-            mListPlaying = mStorageUtil.loadListSongPlaying();
+        }
+        if (mSongIndex != ActivityMusic.DEFAULT_VALUE) {
             updateUI(mSongIndex);
-        }
-        if (mSeekBar.isEnabled()) {
-            changeSeekBar();
             updateImageLikeDislike();
+        } else {
+            disableFirstTime(false);
         }
+
 
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
@@ -228,9 +256,13 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mActivityMusic.mediaService.seekTo(seekBar.getProgress());
-                mRunTime.setText(mDateFormat.format(
-                        mActivityMusic.mediaService.mediaPlayer.getCurrentPosition()));
+                if (mActivityMusic.isServiceBound) {
+                    mActivityMusic.mediaService.seekTo(seekBar.getProgress());
+                    mRunTime.setText(mDateFormat.format(
+                            mActivityMusic.mediaService.mediaPlayer.getCurrentPosition()));
+                }
+
+
             }
         });
     }
@@ -252,16 +284,18 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         }
     }
 
-    public void disableOrEnableClick(boolean b) {
-        mImagePause.setEnabled(b);
-        mImageShuffle.setEnabled(b);
-        mImageRepeat.setEnabled(b);
+    public void disableFirstTime(boolean b) {
         mImageNext.setEnabled(b);
         mImagePrev.setEnabled(b);
         mImageLike.setEnabled(b);
         mImageDislike.setEnabled(b);
         mImageMore.setEnabled(b);
         mSeekBar.setEnabled(b);
+        mImagePause.setEnabled(b);
+    }
+
+    public void disableOrEnableClick(boolean b) {
+//        mSeekBar.setEnabled(b);
     }
 
     private void addToFavorite(View v) {
@@ -370,19 +404,25 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             case NO_REPEAT:
                 mRepeat = REPEAT_ALL;
                 mImageRepeat.setImageResource(R.drawable.ic_repeat_black);
-                mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                if (mActivityMusic.isServiceBound) {
+                    mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                }
                 break;
             case REPEAT_ALL:
                 mRepeat = REPEAT_ONE;
                 mImageRepeat.setImageResource(R.drawable.ic_repeat_one);
                 mStorageUtil.storeRepeat(mRepeat);
-                mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                if (mActivityMusic.isServiceBound) {
+                    mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                }
                 break;
             case REPEAT_ONE:
                 mRepeat = NO_REPEAT;
                 mImageRepeat.setImageResource(R.drawable.ic_repeat_white);
                 mStorageUtil.storeRepeat(mRepeat);
-                mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                if (mActivityMusic.isServiceBound) {
+                    mActivityMusic.mediaService.updateShuffleRepeat(mShuffle, mRepeat);
+                }
                 break;
         }
     }
@@ -395,6 +435,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             mActivityMusic.mediaService.pauseMedia();
             mImagePause.setImageResource(R.drawable.ic_play_circle);
             mActivityMusic.mediaService.buildNotification(PlaybackStatus.PAUSE);
+            mActivityMusic.resumePosition = mActivityMusic.mediaService.mResumePosition;
             mActivityMusic.isPlaying = false;
         } else {
             mImagePause.setImageResource(R.drawable.ic_pause_circle);
@@ -456,6 +497,7 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         }
         updateImageLikeDislike();
         updateTime();
+
     }
 
     /**
@@ -466,12 +508,13 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (mActivityMusic.isServiceBound)
-                if (mActivityMusic.mediaService.mediaPlayer.isPlaying()) {
-                    mSeekBar.setProgress(mActivityMusic.mediaService.mediaPlayer.getCurrentPosition());
-                    mRunTime.setText(mDateFormat.format(
-                            mActivityMusic.mediaService.mediaPlayer.getCurrentPosition()));
-                    handler.postDelayed(this, 500);
+                if (mActivityMusic.isServiceBound) {
+                    if (mActivityMusic.mediaService.mediaPlayer.isPlaying()) {
+                        mSeekBar.setProgress(mActivityMusic.mediaService.mediaPlayer.getCurrentPosition());
+                        mRunTime.setText(mDateFormat.format(
+                                mActivityMusic.mediaService.mediaPlayer.getCurrentPosition()));
+                        handler.postDelayed(this, 500);
+                    }
                 }
             }
         }, 500);

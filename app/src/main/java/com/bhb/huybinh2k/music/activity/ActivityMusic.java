@@ -67,6 +67,8 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     private ImageView mImageSong;
     private TextView mTextViewSong;
     private TextView mTextViewSinger;
+    private int index;
+    private List<Song> listPlaying;
     public DrawerLayout drawerLayout;
     /**
      * Nhận BroadcastReceiver
@@ -99,18 +101,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MediaPlaybackService.LocalBinder binder = (MediaPlaybackService.LocalBinder) iBinder;
             mediaService = binder.getService();
-            if (!isFavoriteFragment) {
-                mIUpdateAllSongsFragment.update(mediaService.songIndexService);
-            }
-            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mIUpdateMediaPlaybackFragment.update(mediaService.songIndexService);
-            }
             if (!mediaService.isPlaying) {
-                mImagePause.setImageResource(R.drawable.ic_play);
                 isPlaying = false;
             } else {
-                mImagePause.setImageResource(R.drawable.ic_pause);
                 isPlaying = true;
+            }
+            updateImagePlayPause();
+            if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mIUpdateMediaPlaybackFragment.update(mediaService.songIndexService);
             }
             isServiceBound = true;
         }
@@ -154,6 +152,14 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
+        index = mStorageUtil.loadSongIndex();
+        listPlaying = mStorageUtil.loadListSongPlaying();
+        if (index != DEFAULT_VALUE) {
+            mLayoutPlayBar.setVisibility(View.VISIBLE);
+            updateUIPlayBar(index);
+        }
+
+
     }
 
     /**
@@ -172,10 +178,23 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_song,
                         mAllSongsFragment).commit();
             }
+            mLayoutPlayBar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_song, mMediaPlaybackFragment)
+                            .addToBackStack(getString(R.string.allsongsfragment)).commit();
+                }
+            });
+
             mImagePause.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clickPlayPause();
+                    if (!isServiceBound) {
+                        playAudio(index, listPlaying);
+                    } else {
+                        clickPlayPause();
+                    }
                 }
             });
         } else {
@@ -253,6 +272,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     public void playAudio(int songIndex, List<Song> list) {
         mStorageUtil.storeListSongPlaying(list);
         mStorageUtil.storeSongIndex(songIndex);
+        isPlaying = true;
         if (!isServiceBound) {
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
             startService(playerIntent);
@@ -349,8 +369,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             if (!isPlaying && isServiceBound) {
                 unbindService(mServiceConnection);
                 mediaService.stopSelf();
-                mStorageUtil.storeSongIndex(DEFAULT_VALUE);
-                mStorageUtil.storeIsFavorite(false);
             }
         }
     }
@@ -365,10 +383,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             if (!isPlaying && isServiceBound) {
                 unbindService(mServiceConnection);
                 mediaService.stopSelf();
-                mStorageUtil.storeSongIndex(DEFAULT_VALUE);
-                mStorageUtil.storeIsFavorite(false);
             }
-
         }
         isBack = false;
     }
@@ -418,8 +433,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     }
 
     /**
-     * @param index
-     * Cập nhật dữ liệu MediaPlayBackFragment khi màn hình xoay ngang
+     * @param index Cập nhật dữ liệu MediaPlayBackFragment khi màn hình xoay ngang
      */
     @Override
     public void update(int index) {
@@ -427,7 +441,7 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Bundle bundle = new Bundle();
             bundle.putInt(AllSongsFragment.SONG_INDEX, index);
             mMediaPlaybackFragment.update(bundle);
-            mMediaPlaybackFragment.disableOrEnableClick(true);
+            mMediaPlaybackFragment.disableFirstTime(true);
             mMediaPlaybackFragment.changeSeekBar();
         }
     }

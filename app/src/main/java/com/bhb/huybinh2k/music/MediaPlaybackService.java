@@ -61,7 +61,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
     private MediaControllerCompat.TransportControls mTransportControls;
     private int mShuffle;
     private int mRepeat;
-    private int mResumePosition;
+    public int mResumePosition;
 
     /**
      * Cập nhật trạng thái của shuffle và repeat
@@ -345,6 +345,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } else {
             mActiveSongService = mSongListService.get(++songIndexService);
         }
+        mResumePosition=0;
         new StorageUtil(getApplicationContext()).storeSongIndex(songIndexService);
         stopMedia();
         mediaPlayer.reset();
@@ -361,6 +362,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnCompl
         } else {
             mActiveSongService = mSongListService.get(--songIndexService);
         }
+        mResumePosition=0;
         new StorageUtil(getApplicationContext()).storeSongIndex(songIndexService);
         stopMedia();
         mediaPlayer.reset();

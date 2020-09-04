@@ -86,16 +86,8 @@ public class BaseSongListFragment extends Fragment implements ActivityMusic.IUpd
             mSongIndex = savedInstanceState.getInt(SONG_INDEX);
             if (mSongIndex != ActivityMusic.DEFAULT_VALUE) update(mSongIndex);
         }
-        mMediaPlaybackFragment = new MediaPlaybackFragment();
+
         if (mOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            mPlayBar.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.frame_song, mMediaPlaybackFragment)
-                            .addToBackStack(getString(R.string.allsongsfragment)).commit();
-                }
-            });
             if (mReplace) {
                 if (mSongIndex != ActivityMusic.DEFAULT_VALUE) update(mSongIndex);
                 mReplace = false;
