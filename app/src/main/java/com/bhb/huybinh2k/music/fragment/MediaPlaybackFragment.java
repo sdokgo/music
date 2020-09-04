@@ -149,7 +149,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                         ++mSongIndex;
                     }
                     mActivityMusic.playAudio(mSongIndex, mListPlaying);
-                    disableOrEnableClick(true);
                     updateUI(mSongIndex);
                 } else {
                     skipToNext();
@@ -166,7 +165,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
                         --mSongIndex;
                     }
                     mActivityMusic.playAudio(mSongIndex, mListPlaying);
-                    disableOrEnableClick(true);
                     updateUI(mSongIndex);
                 } else {
                     skipToPrevious();
@@ -178,7 +176,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
             public void onClick(View view) {
                 if (!mActivityMusic.isServiceBound) {
                     mActivityMusic.playAudio(mSongIndex, mListPlaying);
-                    disableOrEnableClick(true);
                     changeSeekBar();
                     updateUI(mSongIndex);
                 } else {
@@ -222,7 +219,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         updateImageRepeatShuffle();
 
         if (!mActivityMusic.isServiceBound) {
-            disableOrEnableClick(false);
         }
         if (mSongIndex != ActivityMusic.DEFAULT_VALUE) {
             updateUI(mSongIndex);
@@ -294,9 +290,6 @@ public class MediaPlaybackFragment extends Fragment implements ActivityMusic.IUp
         mImagePause.setEnabled(b);
     }
 
-    public void disableOrEnableClick(boolean b) {
-//        mSeekBar.setEnabled(b);
-    }
 
     private void addToFavorite(View v) {
         PopupMenu popupMenu = new PopupMenu(getContext(), v);
