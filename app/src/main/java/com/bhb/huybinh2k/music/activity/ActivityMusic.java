@@ -140,7 +140,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             isPlaying = savedInstanceState.getBoolean(IS_PLAYING);
             resumePosition = savedInstanceState.getInt(RESUME_POSITION);
             updateImagePlayPause();
-            isServiceBound = savedInstanceState.getBoolean(SERVICE_BOUND);
             isFavoriteFragment = savedInstanceState.getBoolean(FAVORITE);
         }
 
@@ -150,7 +149,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
         if (isMyServiceRunning(MediaPlaybackService.class)) {
             Intent playerIntent = new Intent(this, MediaPlaybackService.class);
             bindService(playerIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
-            isServiceBound = true;
         }
         index = mStorageUtil.loadSongIndex();
         listPlaying = mStorageUtil.loadListSongPlaying();
@@ -357,14 +355,6 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
             Log.d(TAG, "onStopActivity");
         }
         unregisterReceiver(mBroadcastReceiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (LogSetting.IS_DEBUG) {
-            Log.d(TAG, "onDestroyActivity");
-        }
         if (isFinishing()) {
             if (!isPlaying && isServiceBound) {
                 unbindService(mServiceConnection);
@@ -374,17 +364,25 @@ public class ActivityMusic extends AppCompatActivity implements IOnClickSongList
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (LogSetting.IS_DEBUG) {
+            Log.d(TAG, "onDestroyActivity");
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         if (LogSetting.IS_DEBUG) {
             Log.d(TAG, "BackPressed");
         }
         super.onBackPressed();
-        if (!isBack) {
-            if (!isPlaying && isServiceBound) {
-                unbindService(mServiceConnection);
-                mediaService.stopSelf();
-            }
-        }
+//        if (!isBack) {
+//            if (!isPlaying && isServiceBound) {
+//                unbindService(mServiceConnection);
+//                mediaService.stopSelf();
+//            }
+//        }
         isBack = false;
     }
 
